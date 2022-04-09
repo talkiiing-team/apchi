@@ -1,0 +1,20 @@
+{
+  "name": "apchi",
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "poke",
+    "shared"
+  ],
+  "description": "Boilerplate for VKMA + pokepoke",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run dev -w client",
+    "back": "npm run dev:nodemon -w poke"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^2.6.2"
+  }
+}

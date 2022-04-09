@@ -1,0 +1,31 @@
+{
+  "name": "@apchi/poke",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/api/index.js",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite-node src/index.ts -w",
+    "dev:nodemon": "nodemon nodemon.json",
+    "tsc": "tsc",
+    "test": "vitest"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "@types/uuid": "^8.3.4",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.1",
+    "vite-node": "^0.8.4",
+    "vitest": "^0.8.4"
+  },
+  "dependencies": {
+    "awilix": "^6.1.0",
+    "fp-ts": "^2.11.8",
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2"
+  }
+}
