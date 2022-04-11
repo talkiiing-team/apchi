@@ -21,6 +21,10 @@ export default defineConfig({
         find: '@',
         replacement: path.resolve(__dirname, 'src'),
       },
+      {
+        find: '@apchi/shared',
+        replacement: path.resolve(__dirname, '../shared/src'),
+      },
     ],
   },
   server: {

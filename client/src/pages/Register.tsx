@@ -3,9 +3,11 @@ import { ArrowRightIcon, LoginIcon } from '@heroicons/react/outline'
 import { useNavigate, Outlet } from 'react-router-dom'
 import { Input } from '@/ui/Input'
 import { useForm } from 'react-hook-form'
-import { User } from '@/types'
+import { Credentials, User } from '@/types'
 import { useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+
+type FormTypes = Pick<User & Credentials, 'name' | 'password'>
 
 export const Register = () => {
   const navigate = useNavigate()
@@ -17,7 +19,7 @@ export const Register = () => {
     formState: { errors },
     getValues,
     setError,
-  } = useForm<Pick<User, 'email' | 'password'>, string>({
+  } = useForm<FormTypes, string>({
     shouldUnregister: true,
     reValidateMode: 'onChange',
   })
@@ -25,16 +27,15 @@ export const Register = () => {
   const { register: createUser, login } = useAuth()
 
   const onSubmit = useCallback(
-    (data: Pick<User, 'email' | 'password'>) =>
+    (data: FormTypes) =>
       createUser(data)
-        .then(() => login(data))
         .then((r: any) => {
           console.log(r)
           navigate('/')
         })
         .catch((e: any) => {
           console.log(e)
-          setError('email', { message: 'Неправильный адрес' })
+          setError('name', { message: 'Имя уже существует' })
           reset(undefined, { keepValues: true })
         }),
     [],
@@ -57,15 +58,17 @@ export const Register = () => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
-          defaultValue={getValues().email}
-          onChange={e => setValue('email', e.currentTarget.value)}
-          label='E-mail'
+          defaultValue={getValues().name}
+          onChange={e => setValue('name', e.currentTarget.value)}
+          label='Ваш псевдоним'
           className='!rounded-xl'
+          id='nickname'
         />
         <Input
           defaultValue={getValues().password}
           onChange={e => setValue('password', e.currentTarget.value)}
           type={'password'}
+          id='password'
           label='Пароль'
           className='!rounded-xl'
         />
@@ -76,10 +79,9 @@ export const Register = () => {
           className='rounded-xl !mt-6'
         />
       </form>
-      {errors.email?.message ? (
+      {errors.name?.message ? (
         <span className='text-rose-400 w-full text-center'>
-          Произошла ошибочка, проверьте Ваш пароль, он должен быть надежным, а
-          почта - только Вашей
+          Произошла ошибочка, проверьте Ваш пароль, он должен быть надежным
         </span>
       ) : null}
     </>

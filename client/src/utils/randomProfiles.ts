@@ -3,7 +3,7 @@ import {
   getRandomName,
   getRandomPhotos,
 } from '@/utils/randomData'
-import { User } from '@apchi/shared'
+import { User } from '@/types'
 
 export const randomUsers = (count: number): (User & Record<string, any>)[] => {
   return Array.from({ length: count }, () => ({

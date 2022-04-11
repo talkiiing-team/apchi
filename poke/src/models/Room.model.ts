@@ -1,9 +1,9 @@
-import { User } from '@/models/User.model'
+import { User } from '@apchi/shared'
 
 export type Room = {
   id: number
   name: string
-  members: User['id'][]
+  members: User['userId'][]
 }
 
 export const primaryKey = 'id'

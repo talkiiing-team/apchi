@@ -26,6 +26,8 @@
     "awilix": "^6.1.0",
     "fp-ts": "^2.11.8",
     "socket.io": "^4.4.1",
-    "uuid": "^8.3.2"
+    "socket.io-client": "^4.4.1",
+    "uuid": "^8.3.2",
+    "websocket-polyfill": "^0.0.3"
   }
 }

@@ -47,5 +47,5 @@ export const SlideButton = ({
 
   console.log('render!')
 
-  return <Button {...passedProps} label={computedContent} />
+  return <Button _isDiv={true} {...passedProps} label={computedContent} />
 }

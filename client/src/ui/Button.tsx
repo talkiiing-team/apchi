@@ -14,6 +14,7 @@ export interface ButtonProps {
   label?: JSX.Element | string | number
   onClick?: (e: MouseEvent<HTMLDivElement | HTMLButtonElement>) => void
   className?: string
+  _isDiv?: boolean
 }
 
 export const ButtonLabelBuilder = ({
@@ -38,6 +39,7 @@ export const Button = ({
   label,
   onClick,
   className,
+  _isDiv,
 }: ButtonProps) => {
   const classes = useMemo(
     () => [
@@ -80,7 +82,18 @@ export const Button = ({
     [variant, semitransparent, outline, circle, center, padding, shadow],
   )
 
-  return (
+  return _isDiv ? (
+    <div
+      className={`${cn(
+        className,
+        classes,
+      )} group relative h-12 select-none overflow-hidden transition-all duration-100 active:translate-y-[1px] active:shadow-none cursor-pointer touch-manipulation`}
+      onTouchStart={undefined}
+      onClick={e => onClick?.(e)}
+    >
+      <ButtonLabelBuilder label={label} icon={icon} />
+    </div>
+  ) : (
     <button
       className={`${cn(
         className,

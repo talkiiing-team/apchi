@@ -1,10 +1,12 @@
-import { useTable } from '@/common/useTable'
-import { User, primaryKey } from '@/models/User.model'
+import { PrimaryKeyFillStrategy, useTable } from '@/common/useTable'
+import { User, userPrimaryKey } from '@apchi/shared'
 
-export const userStore = useTable<User, typeof primaryKey>(
+export const userStore = useTable<User, typeof userPrimaryKey>(
   'users',
-  primaryKey,
-  { pkStrategy: 'autoincrement' },
+  userPrimaryKey,
+  { pkStrategy: PrimaryKeyFillStrategy.AutoIncrement },
 )
+
+//userStore.insert(0, { userId: 0, name: 'talkenson' })
 
 export default userStore

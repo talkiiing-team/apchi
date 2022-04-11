@@ -24,6 +24,8 @@ const Router = () => {
           <Route index element={<Login />} />
           <Route path='register' element={<Register />} />
         </Route>
+
+        <Route path='*' element={<></>} />
       </Route>
     </Routes>
   )

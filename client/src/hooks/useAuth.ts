@@ -7,8 +7,7 @@ import {
 } from '@/store/auth.store'
 import { useCallback, useEffect, useMemo } from 'react'
 import { app } from '@/services'
-import { Credentials, User } from '@apchi/shared'
-import { ErrorResponse, LoginState } from '@/types'
+import { ErrorResponse, LoginState, Credentials, User } from '@/types'
 
 export let globalIsLoggedIn = false
 

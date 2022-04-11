@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
-import { Credentials, User } from '@apchi/shared'
-import { ErrorResponse } from '@/types'
+import { Credentials, User, ErrorResponse } from '@/types'
+import { PokeApp } from '@/services/types'
 
 const baseUrl = import.meta.env.PROD
   ? 'https://ws-apchi.s.talkiiing.ru'
@@ -16,12 +16,14 @@ socket.on('disconnect', () => {
   console.log('Disconnected')
 })
 
+window.socket = socket
+
 const delimiter = '/'
 
 const buildEvent = (service: string, method: string) =>
   `${service}${delimiter}${method}`
 
-export const pokepokeCore = {
+export const pokepokeCore: PokeApp = {
   authenticate(credentials: Credentials) {
     return this.service('authentication').call('auth', credentials)
   },
@@ -35,9 +37,10 @@ export const pokepokeCore = {
     return {
       call(method: string, ...args: any[]): Promise<T> {
         const event = buildEvent(service, method)
-
+        console.log('call')
         return new Promise((res, rej) => {
           socket.emit(event, ...args)
+          console.log('socket sent')
 
           const doneEvent = `${event}.done`
           const errEvent = `${event}.err`
@@ -56,6 +59,12 @@ export const pokepokeCore = {
           socket.on(errEvent, errListener)
         })
       },
+      insert(id, fullBody) {
+        return this.call('insert', id, fullBody)
+      },
+      insertUpdate(id, fullBody) {
+        return this.call('insertUpdate', id, fullBody)
+      },
       create(fullBody: Body) {
         return this.call('create', fullBody)
       },
@@ -73,6 +82,9 @@ export const pokepokeCore = {
       },
       dump() {
         return this.call('dump')
+      },
+      dumpToArray() {
+        return this.call('dumpToArray')
       },
     }
   },

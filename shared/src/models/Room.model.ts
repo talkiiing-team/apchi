@@ -4,6 +4,12 @@ export type Room = {
   id: number
   name: string
   members: User['userId'][]
+  owner: User['userId']
+}
+
+export type DetailedRoom = Omit<Room, 'members' | 'owner'> & {
+  members: User[]
+  owner: User
 }
 
 export const primaryKey = 'id'

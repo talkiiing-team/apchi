@@ -1,7 +1,7 @@
 import {
   CollectionIcon,
-  HeartIcon,
   UserCircleIcon,
+  UsersIcon,
 } from '@heroicons/react/outline'
 import { SVGProps, useEffect, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -21,10 +21,10 @@ const options: NavbarOption[] = [
     badgeKey: 'explore',
   },
   {
-    icon: HeartIcon,
-    title: 'Лайки',
-    link: '/likes',
-    badgeKey: 'likes',
+    icon: UsersIcon,
+    title: 'Друзья',
+    link: '/friends',
+    badgeKey: 'friends',
   },
   {
     icon: UserCircleIcon,

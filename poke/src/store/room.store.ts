@@ -1,11 +1,10 @@
-import { useTable } from '@/common/useTable'
-import { Room, primaryKey } from '@/models/Room.model'
-import authenticationStore from '@/store/authentication.store'
+import { PrimaryKeyFillStrategy, useTable } from '@/common/useTable'
+import { roomPrimaryKey, Room } from '@apchi/shared'
 
-export const roomStore = useTable<Room, typeof primaryKey>(
+export const roomStore = useTable<Room, typeof roomPrimaryKey>(
   'rooms',
-  primaryKey,
-  { pkStrategy: 'autoincrement' },
+  roomPrimaryKey,
+  { pkStrategy: PrimaryKeyFillStrategy.AutoIncrement },
 )
 
 export default roomStore

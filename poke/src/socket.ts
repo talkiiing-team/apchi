@@ -14,4 +14,4 @@ const io = new Server(httpServer, {
 
 registerListeners(io)
 
-export { httpServer }
+export { httpServer, io }

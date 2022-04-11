@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import { exists } from '@/utils/controllerUtils'
 
 export type AnyRecord = Record<string, unknown>
 
@@ -20,14 +21,19 @@ export type CrudMethod = keyof Crud<any, any>
 //export crudMethods: string[] = ['get', 'find', 'findAll', 'findId', 'findAllIds', 'create' ]
 
 export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
-  get(id: T[PK]): T | undefined
+  get(id: T[PK] | undefined): T | undefined
   find(reducer: TableReducerFn<T, PK>): T | undefined
   findAll(reducer: TableReducerFn<T, PK>): T[]
-  findId(reducer: TableReducerFn<T, PK>): PK | undefined
+  findId(reducer: TableReducerFn<T, PK>): T[PK] | undefined
   findAllIds(reducer: TableReducerFn<T, PK>): PK[]
   insert(id: T[PK], item: T): T | undefined
+  insertUpdate(id: T[PK], item: T): T | undefined
   create(item: Omit<T, PK>): T
   patch(id: T[PK], item: Partial<Omit<T, PK>>): T | undefined
+  reduceUpdate(
+    id: T[PK],
+    reducer: (item: Omit<T, PK>) => Omit<T, PK>,
+  ): T | undefined
   update(id: T[PK], item: Omit<T, PK>): T | undefined
   delete(id: T[PK]): T | undefined
   dump(): Table<T, PK>
@@ -35,14 +41,22 @@ export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
   _clean(): void
 }
 
+export enum PrimaryKeyFillStrategy {
+  AutoIncrement = 'autoincrement',
+  UUID = 'uuid',
+}
+
 type TableControllerOptions = {
-  pkStrategy: 'autoincrement' | 'uuid'
+  pkStrategy: PrimaryKeyFillStrategy
 }
 
 const STORAGE: Record<string, Table<any, any>> = {}
 
-const excludeId = <T extends AnyRecord, PK = string>(object: T, pk: PK): T => {
-  const { id, ...rest } = object
+const excludeId = <T extends AnyRecord, PK extends keyof T = keyof T>(
+  object: T,
+  pk: PK,
+): T => {
+  const { [pk]: ex, ...rest } = object
   return rest as T
 } // TODO: Rewrite that shit
 
@@ -56,7 +70,7 @@ export const useTable = <
   name: string,
   pk: PK,
   options: TableControllerOptions = {
-    pkStrategy: 'autoincrement',
+    pkStrategy: PrimaryKeyFillStrategy.AutoIncrement,
   },
 ): Crud<T, typeof pk> => {
   if (!STORAGE[name]) STORAGE[name] = {}
@@ -65,7 +79,7 @@ export const useTable = <
 
   return {
     get(id) {
-      return STORAGE[name][id]
+      return exists(id) ? STORAGE[name][id] : undefined
     },
     find(reducer) {
       return Object.entries(STORAGE[name]).find(([key, value]) =>
@@ -79,21 +93,26 @@ export const useTable = <
     },
     findId(reducer) {
       const result = this.find(reducer)
-      return result ? (result[pk] as PK) : undefined
+      return result ? result[pk] : undefined
     },
     findAllIds(reducer) {
       const result = this.findAll(reducer)
       return result.map(v => v[pk]) as PK[]
     },
     insert(id, item) {
-      if (!id || !item) return undefined
+      if (!exists(id) || !exists(item)) return undefined
 
       STORAGE[name][id as keyof T] = item as T
       return item as T
     },
+    insertUpdate(id, item) {
+      return this.insert(id, item)
+    },
     create(item) {
       const index =
-        options?.pkStrategy === 'autoincrement' ? lastId++ : uuidv4()
+        options?.pkStrategy === PrimaryKeyFillStrategy.AutoIncrement
+          ? lastId++
+          : uuidv4()
 
       const constructed = {
         ...item,
@@ -109,18 +128,27 @@ export const useTable = <
 
       const constructed = {
         ..._item,
-        ...excludeId(item, 'id'),
+        ...excludeId<T, PK>(item as T, pk),
       } as T
 
       STORAGE[name][id as keyof T] = constructed
       return constructed as T
     },
-    update(id, item) {
+    reduceUpdate(id, reducer) {
       const _item = this.get(id)
       if (!_item) return undefined
 
+      const constructed = excludeId<T, PK>(reducer(_item) as T, pk)
+
+      STORAGE[name][id as keyof T] = { ...constructed, id }
+      return constructed as T
+    },
+    update(id, item) {
+      const _item = this.get(id)
+      if (!exists(_item)) return undefined
+
       const constructed = {
-        ...excludeId(item, 'id'),
+        ...excludeId<T, PK>(item as T, pk),
         [pk]: id,
       }
       STORAGE[name][id as keyof T] = constructed
@@ -128,7 +156,7 @@ export const useTable = <
     },
     delete(id) {
       const _item = this.get(id)
-      if (!_item) return undefined
+      if (!exists(_item)) return undefined
       delete STORAGE[name][id]
       return _item
     },

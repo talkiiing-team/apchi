@@ -40,11 +40,11 @@ const App = () => {
 
   useEffect(() => {
     if (loginState === LoginState.NeedRegister) {
-      navigate('/register')
+      navigate('/auth/register')
     } else if (loginState === LoginState.NeedLogin) {
-      navigate('/login')
+      navigate('/auth')
     } else if (loginState === LoginState.Authenticated) {
-      navigate('/explore')
+      navigate('/')
     }
   }, [loginState])
 
@@ -54,12 +54,11 @@ const App = () => {
         <SplitCol spaced={viewWidth > ViewWidth.MOBILE}>
           <View activePanel='main' className='h-full'>
             <Panel id='main' className='h-full'>
-              <PanelHeader>VKUI</PanelHeader>
-              <div className='w-full h-full flex flex-col overflow-x-hidden'>
-                <div className='w-full h-[calc(100%-env(safe-area-inset-bottom))] mx-auto flex flex-col space-y-2 p-3 max-w-lg'>
-                  <div className='w-full'>
-                    <Logo className='mx-auto text-violet-500 h-16' />
-                  </div>
+              <PanelHeader>
+                <Logo className='text-violet-500 h-8 translate-y-0.5' />
+              </PanelHeader>
+              <div className='w-full h-full flex flex-col overflow-x-hidden flex-grow'>
+                <div className='w-full mx-auto flex flex-col space-y-2 p-3 max-w-lg'>
                   <Outlet />
                 </div>
                 <Navbar />
