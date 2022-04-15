@@ -25,7 +25,9 @@ export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
   find(reducer: TableReducerFn<T, PK>): T | undefined
   findAll(reducer: TableReducerFn<T, PK>): T[]
   findId(reducer: TableReducerFn<T, PK>): T[PK] | undefined
-  findAllIds(reducer: TableReducerFn<T, PK>): PK[]
+  findAllIds(reducer: TableReducerFn<T, PK>): T[PK][]
+  selectSome(reducer: TableReducerFn<T, PK>, total: number): T[]
+  selectSomeIds(reducer: TableReducerFn<T, PK>, total: number): T[PK][]
   insert(id: T[PK], item: T): T | undefined
   insertUpdate(id: T[PK], item: T): T | undefined
   create(item: Omit<T, PK>): T
@@ -37,8 +39,9 @@ export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
   update(id: T[PK], item: Omit<T, PK>): T | undefined
   delete(id: T[PK]): T | undefined
   dump(): Table<T, PK>
-  dumpToArray(): T[]
+  dumpToArray(length?: number): T[]
   _clean(): void
+  length(): number
 }
 
 export enum PrimaryKeyFillStrategy {
@@ -97,7 +100,21 @@ export const useTable = <
     },
     findAllIds(reducer) {
       const result = this.findAll(reducer)
-      return result.map(v => v[pk]) as PK[]
+      return result.map(v => v[pk])
+    },
+    selectSome(reducer, total) {
+      if (total <= 0) return []
+      const selection: T[] = []
+      for (let [key, item] of Object.entries<T>(STORAGE[name])) {
+        if (selection.length === total) return selection
+        if (reducer(item, key as PK)) {
+          selection.push(item)
+        }
+      }
+      return selection
+    },
+    selectSomeIds(reducer, total) {
+      return this.selectSome(reducer, total).map(v => v[pk])
     },
     insert(id, item) {
       if (!exists(id) || !exists(item)) return undefined
@@ -138,9 +155,9 @@ export const useTable = <
       const _item = this.get(id)
       if (!_item) return undefined
 
-      const constructed = excludeId<T, PK>(reducer(_item) as T, pk)
+      const constructed = { ...excludeId<T, PK>(reducer(_item) as T, pk), id }
 
-      STORAGE[name][id as keyof T] = { ...constructed, id }
+      STORAGE[name][id as keyof T] = constructed
       return constructed as T
     },
     update(id, item) {
@@ -163,11 +180,14 @@ export const useTable = <
     dump() {
       return STORAGE[name]
     },
-    dumpToArray() {
-      return Object.values(STORAGE[name])
+    dumpToArray(length) {
+      return Object.values(STORAGE[name]).slice(0, length)
     },
     _clean() {
       STORAGE[name] = {}
+    },
+    length() {
+      return STORAGE[name]?.length
     },
   }
 }

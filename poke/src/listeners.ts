@@ -6,10 +6,7 @@ import { registerControllers } from '@/common/registerController'
 
 export const registerListeners = (io: Server) => {
   io.on('connection', sock => {
-    registerControllers(
-      io,
-      sock,
-    )([
+    registerControllers(io)(sock)([
       registerUsersController,
       registerRoomsController,
       registerAuthenticateController,

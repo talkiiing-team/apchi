@@ -1,4 +1,4 @@
-import { Credentials, User } from '@apchi/shared'
+import { Credentials, RoomSection, Section, User } from '@apchi/shared'
 
 export type AnyRecord = Record<string, unknown>
 
@@ -35,6 +35,10 @@ export type PokeAppService = <
   dumpToArray: () => ReturnType<ServiceCallType<T>>
 }
 
+type ReturnableOffFunction = () => void
+
+export type EventType<Event extends string = string> = `@${Section}/${Event}`
+
 export type PokeApp = {
   service: PokeAppService
   authenticate: (
@@ -43,4 +47,14 @@ export type PokeApp = {
   register: (
     registerData: RegisterData,
   ) => ReturnType<ReturnType<PokeAppService>['call']>
+  on: <T extends string>(
+    eventType: EventType<T>,
+    listener: ListenerPoke,
+  ) => ReturnableOffFunction
+  off: <T extends string>(
+    eventType: EventType<T>,
+    listener: ListenerPoke,
+  ) => void
 }
+
+export type ListenerPoke = (...args: any[]) => void

@@ -3,4 +3,5 @@ export enum RoomSection {
   userLeft = 'userLeft',
   newMessage = 'newMessage',
   roomUpdated = 'roomUpdated',
+  newPublicRooms = 'newPublicRooms',
 }

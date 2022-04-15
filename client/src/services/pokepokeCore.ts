@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 import { Credentials, User, ErrorResponse } from '@/types'
-import { PokeApp } from '@/services/types'
+import { EventType, ListenerPoke, PokeApp } from './types'
 
 const baseUrl = import.meta.env.PROD
   ? 'https://ws-apchi.s.talkiiing.ru'
@@ -23,7 +23,34 @@ const delimiter = '/'
 const buildEvent = (service: string, method: string) =>
   `${service}${delimiter}${method}`
 
-export const pokepokeCore: PokeApp = {
+const listenerMap: Record<string, Set<ListenerPoke>> = {} //new Map<string, ListenerPoke[]>()
+
+socket.io.on('packet', packet => {
+  if (packet.data && packet.data instanceof Array) {
+    console.log(packet.data)
+    const fullEventData = packet.data as Array<any>
+    const [eventName, ...data] = fullEventData
+    if (listenerMap[eventName]) {
+      console.log(
+        listenerMap[eventName].size,
+        ' listeners will be called, ',
+        data,
+      )
+      listenerMap[eventName].forEach(listener => listener(...data))
+    }
+  }
+})
+
+export const pokepokeCore: PokeApp & Record<any, any> = {
+  on<T extends string>(section: EventType<T>, listener: ListenerPoke) {
+    if (!listenerMap[section]) listenerMap[section] = new Set<ListenerPoke>()
+    listenerMap[section].add(listener)
+    return () => this.off(section, listener)
+  },
+  off<T extends string>(section: EventType<T>, listener: ListenerPoke) {
+    if (!listenerMap[section]) return undefined
+    listenerMap[section].delete(listener)
+  },
   authenticate(credentials: Credentials) {
     return this.service('authentication').call('auth', credentials)
   },

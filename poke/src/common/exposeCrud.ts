@@ -8,7 +8,8 @@ import { Controller } from '@/types'
 export const exposeCrud =
   (store: Crud<any, any>, exposedMethods?: CrudMethod[]) =>
   (basePrefix: string): Controller =>
-  (io: Server, sock: Socket, listeners) => {
+  (io: Server) =>
+  (sock: Socket, listeners) => {
     const prefix = buildPrefix(basePrefix)
 
     Object.entries(store)

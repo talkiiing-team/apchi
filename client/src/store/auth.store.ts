@@ -1,9 +1,9 @@
 import { atom, DefaultValue, selector, selectorFamily } from 'recoil'
-import { LoginState, User } from '@/types'
+import { LoginState, User, UserWithRequiredId } from '@/types'
 
-export const userStore = atom<Partial<User> & Pick<User, 'userId'>>({
+export const userStore = atom<UserWithRequiredId>({
   key: 'userStateStore',
-  default: { userId: 0 },
+  default: { userId: Math.round(Math.random() * 10000) },
 })
 
 export const userIdStore = selector<number>({

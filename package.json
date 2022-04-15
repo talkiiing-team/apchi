@@ -16,5 +16,9 @@
   "license": "ISC",
   "devDependencies": {
     "prettier": "^2.6.2"
+  },
+  "dependencies": {
+    "@types/crypto-js": "^4.1.1",
+    "crypto-js": "^4.1.1"
   }
 }

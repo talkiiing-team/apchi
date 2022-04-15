@@ -4,8 +4,8 @@ import { PokeApp } from '@/services/types'
 
 type ResultComponentPropsType<P> = Omit<P, 'app'> & { app: PokeApp }
 
-export function withApp<P = any>(
-  Component: React.ComponentType<ResultComponentPropsType<P>>,
-): React.FC<ResultComponentPropsType<P>> {
+export function withApp<Props = any>(
+  Component: React.ComponentType<ResultComponentPropsType<Props>>,
+): React.FC<Props> {
   return props => <Component {...props} app={pokepokeCore} />
 }

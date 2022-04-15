@@ -7,7 +7,13 @@ import {
 } from '@/store/auth.store'
 import { useCallback, useEffect, useMemo } from 'react'
 import { app } from '@/services'
-import { ErrorResponse, LoginState, Credentials, User } from '@/types'
+import {
+  ErrorResponse,
+  LoginState,
+  Credentials,
+  User,
+  UserWithRequiredId,
+} from '@/types'
 
 export let globalIsLoggedIn = false
 
@@ -49,6 +55,7 @@ export const useAuth = (isSingletonMaster: boolean = false) => {
     (data: Omit<User & Credentials, 'userId'>) =>
       app.register({ ...data, userId }).then(r => {
         localStorage.setItem('user', JSON.stringify(r))
+        setUser(r as UserWithRequiredId)
         setLoginState(LoginState.Authenticated)
         return r
       }),
@@ -61,6 +68,7 @@ export const useAuth = (isSingletonMaster: boolean = false) => {
         .authenticate({ ...data, userId })
         .then(r => {
           localStorage.setItem('user', JSON.stringify(r))
+          setUser(r as UserWithRequiredId)
           setLoginState(LoginState.Authenticated)
           return r
         })

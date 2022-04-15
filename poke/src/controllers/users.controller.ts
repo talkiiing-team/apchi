@@ -2,15 +2,13 @@ import { exposeCrud } from '@/common/exposeCrud'
 import { userStore } from '@/store/user.store'
 import { Server, Socket } from 'socket.io'
 import { Controller } from '@/types'
+import { fakeUser } from '@/dataUtils/fakeUser'
 
 const basePrefix = 'users'
 
-export const registerUsersController: Controller = (
-  io: Server,
-  sock: Socket,
-  listeners,
-) => {
-  exposeCrud(userStore, ['get', 'patch', 'update', 'dump', 'dumpToArray'])(
-    basePrefix,
-  )(io, sock, listeners)
-}
+export const registerUsersController: Controller =
+  (io: Server) => (sock: Socket, listeners) => {
+    exposeCrud(userStore, ['get', 'patch', 'update', 'dump', 'dumpToArray'])(
+      basePrefix,
+    )(io)(sock, listeners)
+  }

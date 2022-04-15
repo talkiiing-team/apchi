@@ -5,4 +5,5 @@ export { primaryKey as userPrimaryKey } from './models/User.model'
 export { primaryKey as roomPrimaryKey } from './models/Room.model'
 export { primaryKey as credentialsPrimaryKey } from './models/Credentials.model'
 
+export { Section } from './enums/sections'
 export { RoomSection } from './enums/room.section'

@@ -1,9 +1,3 @@
-import { User } from '@apchi/shared'
-
-export type Room = {
-  id: number
-  name: string
-  members: User['userId'][]
-}
+export type { Room } from '@apchi/shared'
 
 export const primaryKey = 'id'

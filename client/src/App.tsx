@@ -16,8 +16,9 @@ import {
 } from '@vkontakte/vkui'
 import { loginStateStore } from '@/store/auth.store'
 import { LoginState } from '@/types'
+import { withApp } from '@/hoc/withApp'
 
-const App = () => {
+const App = withApp(({ app }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, authenticated } = useAuth(true)
@@ -27,6 +28,14 @@ const App = () => {
 
   useEffect(() => {
     console.log('auth', authenticated)
+    const globalUnSubscriber = () => {
+      app
+        .service('rooms')
+        .call('leave')
+        .then(r => console.log('left room in cause of session end'))
+    }
+    window.addEventListener('close', globalUnSubscriber)
+    return globalUnSubscriber
   }, [authenticated])
 
   useEffect(() => {
@@ -57,7 +66,7 @@ const App = () => {
               <PanelHeader>
                 <Logo className='text-violet-500 h-8 translate-y-0.5' />
               </PanelHeader>
-              <div className='w-full h-full flex flex-col overflow-x-hidden flex-grow'>
+              <div className='w-full h-full pb-[4rem] flex flex-col overflow-x-hidden overflow-y-hidden flex-grow'>
                 <div className='w-full mx-auto flex flex-col space-y-2 p-3 max-w-lg'>
                   <Outlet />
                 </div>
@@ -69,6 +78,6 @@ const App = () => {
       </SplitLayout>
     </AppRoot>
   )
-}
+})
 
 export default App

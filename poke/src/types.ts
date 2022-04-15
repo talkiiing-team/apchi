@@ -12,6 +12,4 @@ export type ListenerMap = Map<EventName, ListenerFunction>
  */
 export type Controller = (
   io: Server,
-  socket: Socket,
-  listeners: ListenerMap,
-) => void
+) => (socket: Socket, listeners: ListenerMap) => void

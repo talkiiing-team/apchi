@@ -3,9 +3,7 @@ import { InputSpaced } from '@/ui/InputSpaced'
 import { Button } from '@/ui/Button'
 import { CheckIcon, RefreshIcon } from '@heroicons/react/outline'
 import { Select } from '@/ui/Select'
-import { useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
-import { LoaderCircle } from '@/ui/LoaderCircle'
 
 export const EditProfile = () => {
   const [loading, setLoading] = useState<boolean>(false)
