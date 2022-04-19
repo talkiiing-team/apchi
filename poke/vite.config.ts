@@ -1,12 +1,12 @@
-/// <reference models="vitest" />
-
 import * as path from 'path'
+import viteTsconfigPaths from 'vite-tsconfig-paths'
 
 import { defineConfig } from 'vite'
 
 import pkg from './package.json'
 
 export default defineConfig({
+  plugins: [viteTsconfigPaths()],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/app/app.ts'),
@@ -17,14 +17,6 @@ export default defineConfig({
     rollupOptions: {
       external: [...Object.keys(pkg.dependencies)],
     },
-  },
-  resolve: {
-    alias: [
-      {
-        find: '@',
-        replacement: path.resolve(__dirname, 'src'),
-      },
-    ],
   },
   test: {},
 })

@@ -4,4 +4,6 @@ export enum RoomSection {
   newMessage = 'newMessage',
   roomUpdated = 'roomUpdated',
   newPublicRooms = 'newPublicRooms',
+  roomClosed = 'roomClosed',
+  gameSelected = 'gameSelected',
 }

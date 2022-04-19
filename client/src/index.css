@@ -8,6 +8,7 @@ html {
   -webkit-font-smoothing: antialiased;
   font-weight: 400;
   letter-spacing: normal;
+  @apply font-sans;
 }
 h1,
 h2,
@@ -20,6 +21,7 @@ textarea {
 
 :root {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  --font-common: theme('fontFamily.sans');
 }
 
 input {

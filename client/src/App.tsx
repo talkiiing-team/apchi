@@ -17,6 +17,7 @@ import {
 import { loginStateStore } from '@/store/auth.store'
 import { LoginState } from '@/types'
 import { withApp } from '@/hoc/withApp'
+import { NotifyRoot } from '@/components/NotifyRoot'
 
 const App = withApp(({ app }) => {
   const location = useLocation()
@@ -71,6 +72,7 @@ const App = withApp(({ app }) => {
                   <Outlet />
                 </div>
                 <Navbar />
+                <NotifyRoot />
               </div>
             </Panel>
           </View>

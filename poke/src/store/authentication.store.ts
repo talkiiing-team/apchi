@@ -1,9 +1,9 @@
 import { useTable } from '@/common/useTable'
-import { Credentials, primaryKey } from '@/models/Credentials.model'
+import { Credentials, credentialsPrimaryKey } from '@apchi/shared'
 
-export const authenticationStore = useTable<Credentials, typeof primaryKey>(
-  'authentication',
-  primaryKey,
-)
+export const authenticationStore = useTable<
+  Credentials,
+  typeof credentialsPrimaryKey
+>('authentication', credentialsPrimaryKey)
 
 export default authenticationStore

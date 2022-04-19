@@ -5,24 +5,35 @@ import { inGameStateStore, roomCurrentStore } from '@/store/room.store'
 import { RoomMembers } from '@/components/RoomMembers'
 import { useMemo } from 'react'
 import { userIdStore } from '@/store/auth.store'
+import { GameSelector } from '@/components/GameSelector'
 
 export const Investigate = () => {
   const [inGameState, setInGameState] = useRecoilState(inGameStateStore)
   const room = useRecoilValue(roomCurrentStore)
   const userId = useRecoilValue(userIdStore)
 
+  const memoizedMembers = useMemo(
+    () => (
+      <RoomMembers
+        members={room?.members}
+        owner={room?.owner}
+        currentUserId={userId}
+      />
+    ),
+    [userId, room?.members, room?.owner],
+  )
+
   const content = useMemo(
     () =>
       inGameState && room?.members && room.owner ? (
-        <RoomMembers
-          members={room.members}
-          owner={room.owner}
-          currentUserId={userId}
-        />
+        <>
+          <GameSelector />
+          {memoizedMembers}
+        </>
       ) : (
         <GamesList />
       ),
-    [inGameState, room?.members, room?.owner],
+    [inGameState, memoizedMembers],
   )
 
   return (

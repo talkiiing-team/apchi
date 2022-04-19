@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -20,8 +21,13 @@
       "@apchi/shared": ["../shared/src"]
     },
     "baseUrl": "./",
-    "types": ["vite/client","vite-plugin-svgr/client"]
+    "types": ["vite/client", "vite-plugin-svgr/client"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    {
+      "path": "../shared/tsconfig.json"
+    }
+  ]
 }

@@ -4,7 +4,7 @@ import { EventType, ListenerPoke, PokeApp } from './types'
 
 const baseUrl = import.meta.env.PROD
   ? 'https://ws-apchi.s.talkiiing.ru'
-  : 'http://localhost:3030'
+  : `http://${location.hostname}:3030`
 
 const socket = io(baseUrl, { transports: ['polling', 'websocket'] })
 

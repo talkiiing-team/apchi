@@ -19,6 +19,13 @@ import { createRoomHash } from '@/utils/createRoomHash'
 import { buildLobbyName } from '@/utils/buildLobbyName'
 import { fakeUser } from '@/dataUtils/fakeUser'
 import userStore from '@/store/user.store'
+import { Game } from '@apchi/shared/src/models/Game.model'
+import {
+  getGamesIds,
+  getGamesList,
+  setRoomEngine,
+} from '@/daemon/general.daemon'
+import { games } from '@apchi/games'
 
 const basePrefix = 'rooms'
 const prefix = buildPrefix(basePrefix)
@@ -39,29 +46,31 @@ const addRoomToWaitList = (roomId: Room['id']) => {
 const removeRoomFromWaitList = (roomId: Room['id']) => {
   const foundRoomId = newRoomsToBeSent.findIndex(v => roomId)
   if (~foundRoomId) {
-    newRoomsToBeSent.filter(v => v! == roomId)
+    newRoomsToBeSent = newRoomsToBeSent.filter(v => v! == roomId)
   }
 }
 
 export const registerRoomsController: Controller = (io: Server) => {
-  const interval = setInterval(() => {
+  /*const interval = setInterval(() => {
     if (roomStore.length() > 0) {
-      console.log('sending that we has new rooms')
+      console.log('sending all new rooms')
       io.to(buildLobbyName()).emit(
         buildBroadcastEventName(Section.Room)(RoomSection.newPublicRooms),
-        roomStore.dumpToArray(10).map(room => populateRoom(room)),
+        roomStore
+          .selectSome(room => room.isOpen, 10)
+          .map(room => populateRoom(room)),
       )
       newRoomsToBeSent = []
     }
-  }, 5000)
+  }, 1000)*/
+
+  //io.on('disconnect', () => clearInterval(interval))
 
   return (sock: Socket, listeners) => {
     exposeCrud(roomStore, ['get', 'dump', 'dumpToArray'])(basePrefix)(io)(
       sock,
       listeners,
     )
-
-    sock.on('disconnect', () => clearInterval(interval))
 
     listeners.set(prefix('create'), (item: Room) => {
       const user = getContextUser(sock)
@@ -170,14 +179,24 @@ export const registerRoomsController: Controller = (io: Server) => {
           prefix('leave.err'),
           sock,
         )({ reason: 'Unauthenticated', code: 403 })
-      const roomId = roomStore.findId(room => room.members.includes(userId))
-      if (!exists(roomId))
+      const room = roomStore.find(room => room.members.includes(userId))
+      if (!exists(room))
         return emit(
           prefix('leave.err'),
           sock,
         )({ reason: 'Not participated in any room', code: 404 })
 
-      const result = roomStore.reduceUpdate(roomId, room => ({
+      if (room.owner === userId) {
+        io.in(buildRoomName(room.id)).emit(
+          buildBroadcastEventName(Section.Room)(RoomSection.roomClosed),
+        )
+        sock.leave(buildRoomName(room.id))
+        sock.join(buildLobbyName())
+        roomStore.delete(room.id)
+        return emit(prefix('leave.done'), sock)()
+      }
+
+      const result = roomStore.reduceUpdate(room.id, room => ({
         ...room,
         members: room.members.filter(v => v !== userId),
       }))
@@ -188,7 +207,7 @@ export const registerRoomsController: Controller = (io: Server) => {
         buildBroadcastEventName(Section.Room)(RoomSection.userLeft),
         { ...result, members: roomMembersPopulate(result!.members) },
       )
-      sock.leave(buildRoomName(roomId))
+      sock.leave(buildRoomName(room.id))
       sock.join(buildLobbyName())
       return emit(prefix('leave.done'), sock)()
     })
@@ -254,6 +273,12 @@ export const registerRoomsController: Controller = (io: Server) => {
           code: isOpen ? room.code : preparedHash,
         }))
 
+        if (isOpen) {
+          addRoomToWaitList(roomIdSubmit)
+        } else {
+          removeRoomFromWaitList(roomIdSubmit)
+        }
+
         const populated: DetailedRoom = populateRoom(result!)
 
         io.in(buildRoomName(roomIdSubmit)).emit(
@@ -277,5 +302,46 @@ export const registerRoomsController: Controller = (io: Server) => {
         .map(v => populateRoom(v))
       return emit(prefix('list.done'), sock)(result)
     })
+
+    listeners.set(
+      prefix('selectGame'),
+      (roomId: Room['id'], gameId: Game['id'] | null) => {
+        const user = getContextUser(sock)
+        if (!exists(user))
+          return emit(
+            prefix('selectGame.err'),
+            sock,
+          )({ reason: 'Forbidden', code: 403 })
+
+        if (gameId !== null && !getGamesIds().includes(gameId)) {
+          return emit(
+            prefix('selectGame.err'),
+            sock,
+          )({ reason: "Game doesn't exist in this apchi instance", code: 404 })
+        }
+
+        const roomIdSubmit = roomStore.findId(
+          room => room.id === roomId && room.owner === user.userId,
+        )
+        if (!exists(roomIdSubmit))
+          return emit(
+            prefix('selectGame.err'),
+            sock,
+          )({ reason: "You're not an admin", code: 403 })
+
+        const result = roomStore.reduceUpdate(roomIdSubmit, room => ({
+          ...room,
+          game: gameId === null ? undefined : gameId,
+        }))
+
+        if (gameId !== null) setRoomEngine(roomIdSubmit, gameId)
+
+        io.in(buildRoomName(roomIdSubmit)).emit(
+          buildBroadcastEventName(Section.Room)(RoomSection.gameSelected),
+          { game: gameId },
+        )
+        return emit(prefix('selectGame.done'), sock)(result)
+      },
+    )
   }
 }

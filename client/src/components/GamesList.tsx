@@ -36,7 +36,7 @@ export const GamesList = withApp(({ app }) => {
 
   return (
     <Section
-      title='Список открытых игр'
+      title='Открытые комнаты'
       sideTitle={<span className='px-1'>{roomList.length}</span>}
     >
       {roomList.map(v => (

@@ -4,4 +4,4 @@ export type User = {
   avatar?: string
 }
 
-export const primaryKey = 'userId'
+export const userPrimaryKey = 'userId'

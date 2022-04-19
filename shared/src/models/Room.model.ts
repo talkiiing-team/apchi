@@ -1,4 +1,5 @@
 import { User } from './User.model'
+import { Game } from './Game.model'
 
 export type Room = {
   id: number
@@ -7,6 +8,7 @@ export type Room = {
   owner: User['userId']
   isOpen: boolean
   code?: string
+  game?: Game['id']
 }
 
 export type DetailedRoom = Omit<Room, 'members' | 'owner'> & {
@@ -14,4 +16,4 @@ export type DetailedRoom = Omit<Room, 'members' | 'owner'> & {
   owner: User
 }
 
-export const primaryKey = 'id'
+export const roomPrimaryKey = 'id'

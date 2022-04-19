@@ -10,7 +10,7 @@ export const registerControllers =
       socket.on(eventName, listenerFn)
     })
 
-    socket.onAny((...args) => console.log(socket.rooms, args))
+    socket.onAny((...args) => console.log(socket.id, socket.rooms, args))
 
     socket.on('disconnect', () => {
       listenerMap.forEach((listenerFn, eventName) =>

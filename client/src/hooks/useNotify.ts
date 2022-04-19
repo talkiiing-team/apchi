@@ -1,5 +1,5 @@
 import { useRecoilState } from 'recoil'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { notificationStore } from '@/store/notification.store'
 import { Notification, NotificationImportance } from '@/types'
 import md5 from 'crypto-js/md5'
@@ -17,13 +17,55 @@ const buildNotification = (note: NotificationToPush): Notification => {
   }
 }
 
-export const useNotify = () => {
+export const useNotify = (isMasterHook?: boolean, timeout: number = 1000) => {
   const [store, setStore] = useRecoilState(notificationStore)
 
   const push = useCallback((notification: NotificationToPush) => {
     const newNotification = buildNotification(notification)
     setStore(store => ({ ...store, new: [...store.new, newNotification] }))
+    return newNotification.id
   }, [])
 
-  return {}
+  const markAsRead = useCallback((notificationId: Notification['id']) => {
+    setStore(store => {
+      const notification = store.new.find(n => n.id === notificationId)
+      if (!notification) return store
+      return {
+        ...store,
+        old: [...store.old, notification],
+        new: store.new.filter(n => n.id !== notificationId),
+      }
+    })
+  }, [])
+
+  const [currentNotification, setCurrentNotification] = useState<
+    Notification | undefined
+  >()
+
+  const getNext = useCallback(() => {
+    const node = store.new[0]
+    if (node) {
+      setCurrentNotification(undefined)
+      setTimeout(() => {
+        setCurrentNotification(node)
+        markAsRead(node.id)
+      }, timeout)
+    } else {
+      setCurrentNotification(undefined)
+    }
+  }, [store.new, timeout])
+
+  useEffect(() => {
+    if (isMasterHook) {
+      getNext()
+    }
+  }, []) // no deps
+
+  useEffect(() => {
+    if (isMasterHook && !currentNotification && store.new.length) {
+      getNext()
+    }
+  }, [store.new])
+
+  return { push, markAsRead, store, getNext, currentNotification }
 }

@@ -1,6 +1,4 @@
 import { FC } from 'react'
-import { ShareIcon, UserGroupIcon } from '@heroicons/react/solid'
-import { copyToClipboard } from '@/utils/copyToClipboard'
 
 export const Section: FC<{
   title?: string
@@ -14,7 +12,7 @@ export const Section: FC<{
       {props.title || props.sideTitle ? (
         <div className='flex justify-between text-sm text-zinc-500'>
           {props.title ? (
-            <span className='text-sm text-zinc-500'>{props.title}</span>
+            <span className='text-sm text-zinc-500 px-0.5'>{props.title}</span>
           ) : null}
 
           {props.sideTitle ? props.sideTitle : null}

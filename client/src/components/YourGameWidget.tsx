@@ -16,6 +16,7 @@ import { inGameStateStore, roomCurrentStore } from '@/store/room.store'
 import { Input } from '@/ui/Input'
 import { UserGroupIcon, ShareIcon } from '@heroicons/react/solid'
 import { copyToClipboard } from '@/utils/copyToClipboard'
+import { useNotify } from '@/hooks/useNotify'
 
 export const YourGameWidget = withApp(({ app }) => {
   const [inGameState, setInGameState] = useRecoilState(inGameStateStore)
@@ -26,6 +27,7 @@ export const YourGameWidget = withApp(({ app }) => {
   } = useAuth()
   const joinInput = useRef<HTMLInputElement>(null)
   const [joinGameState, setJoinGameState] = useState<string>('')
+  const { push } = useNotify()
 
   useEffect(() => {
     const offUpdate = app.on<RoomSection>(
@@ -49,10 +51,16 @@ export const YourGameWidget = withApp(({ app }) => {
         setRoom(room => (room ? { ...room, members } : undefined))
       },
     )
+    const offRoomClosed = app.on<RoomSection>('@room/roomClosed', () => {
+      console.log('room closed, kiss my ass')
+      setRoom(undefined)
+      setInGameState(false)
+    })
     return () => {
       offUpdate()
       offUserJoin()
       offUserLeave()
+      offRoomClosed()
     }
   }, [])
 
@@ -147,7 +155,7 @@ export const YourGameWidget = withApp(({ app }) => {
       }
     >
       <div className='flex justify-between items-center text-2xl text-zinc-700'>
-        <span className='max-w-[calc(100%-4rem)] text-ellipsis overflow-hidden whitespace-nowrap'>
+        <span className='max-w-[calc(100%-4rem)] text-ellipsis overflow-hidden whitespace-nowrap px-0.5'>
           {room?.name || 'Unknown'}
         </span>
         <div className='flex items-center justify-end h-8'>
@@ -182,7 +190,7 @@ export const YourGameWidget = withApp(({ app }) => {
   ) : (
     <>
       <Section title='Текущая игра'>
-        <span className='text-2xl text-zinc-700'>Нет игры</span>
+        <span className='text-2xl text-zinc-700 px-0.5'>Нет игры</span>
         <Button
           icon={<PlusIcon className='text-white w-5 h-5' />}
           label='Создать игру'
@@ -216,6 +224,10 @@ export const YourGameWidget = withApp(({ app }) => {
           className='w-full'
           onClick={() => {
             joinGame()
+            push({
+              title: 'Button tыked',
+              text: Math.random().toString(),
+            })
           }}
         />
       </Section>

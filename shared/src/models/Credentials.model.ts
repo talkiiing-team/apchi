@@ -3,4 +3,4 @@ export type Credentials = {
   password: string
 }
 
-export const primaryKey = 'userId'
+export const credentialsPrimaryKey = 'userId'

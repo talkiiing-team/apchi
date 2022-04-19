@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "module": "esnext",
+    "downlevelIteration": true,
+    "lib": ["ESNext"],
+    "target": "esnext",
+    "strict": true,
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "types": ["vite/client", "@types/node"],
+    "paths": {
+      "@apchi/shared": ["shared/src/index.ts"],
+      "@apchi/games": ["games/src/index.ts"]
+    }
+  },
+  "include": ["poke/**/*.ts"],
+  "exclude": ["node_modules"]
+}
