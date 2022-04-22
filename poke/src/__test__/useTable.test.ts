@@ -1,4 +1,4 @@
-import { useTable } from '@/common/useTable'
+import { useTable } from '@apchi/shared/src/base/useTable'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 type User = {
@@ -15,7 +15,7 @@ const excludeId = (user: User): Omit<User, 'id'> => {
 type UserWithoutId = Omit<User, 'id'>
 
 describe('useTable test set', () => {
-  const users = useTable<User, 'id'>('users', 'id')
+  const users = useTable({})<User, 'id'>('users', 'id')
 
   beforeEach(() => {
     users._clean()

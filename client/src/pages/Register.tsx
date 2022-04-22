@@ -44,10 +44,12 @@ export const Register = () => {
   return (
     <>
       <div className='flex flex-col items-center space-y-2 p-2'>
-        <h2 className='font-fancy text-3xl'>Привет!</h2>
-        <h4 className='font-fancy text-xl'>Давай знакомиться!</h4>
+        <h2 className='text-center font-sans text-3xl font-light'>Привет!</h2>
+        <h4 className='text-center font-sans text-xl font-light'>
+          Давай знакомиться!
+        </h4>
         <span
-          className='font-sans text-blue-500 media-hover:hover:text-blue-600 cursor-pointer select-none'
+          className='media-hover:hover:text-blue-600 cursor-pointer select-none font-sans text-blue-500'
           onClick={() => navigate('/auth')}
         >
           У меня есть аккаунт
@@ -74,13 +76,13 @@ export const Register = () => {
         />
         <SlideButton
           label='Зарегистрироваться'
-          icon={<LoginIcon className='w-5 h-5 text-white stroke-1' />}
-          subIcon={<ArrowRightIcon className='w-5 h-5 text-white stroke-1' />}
-          className='rounded-xl !mt-6'
+          icon={<LoginIcon className='h-5 w-5 stroke-1 text-white' />}
+          subIcon={<ArrowRightIcon className='h-5 w-5 stroke-1 text-white' />}
+          className='!mt-6 rounded-xl'
         />
       </form>
       {errors.name?.message ? (
-        <span className='text-rose-400 w-full text-center'>
+        <span className='w-full text-center text-rose-400'>
           Произошла ошибочка, проверьте Ваш пароль, он должен быть надежным
         </span>
       ) : null}

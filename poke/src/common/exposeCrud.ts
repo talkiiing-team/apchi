@@ -1,6 +1,6 @@
 import { flow } from 'fp-ts/lib/function'
 import { Server, Socket } from 'socket.io'
-import { Crud, CrudMethod } from './useTable'
+import { Crud, CrudMethod } from '@apchi/shared/src/base/useTable'
 import { emit } from '@/utils/emit'
 import { buildPrefix } from '@/utils/buildPrefix'
 import { Controller } from '@/types'

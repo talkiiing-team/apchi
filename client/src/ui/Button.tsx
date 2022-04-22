@@ -14,6 +14,7 @@ export interface ButtonProps {
   label?: JSX.Element | string | number
   onClick?: (e: MouseEvent<HTMLDivElement | HTMLButtonElement>) => void
   className?: string
+  disabled?: boolean
   _isDiv?: boolean
 }
 
@@ -21,7 +22,7 @@ export const ButtonLabelBuilder = ({
   label,
   icon,
 }: Pick<ButtonProps, 'label' | 'icon'>) => (
-  <div className='flex space-x-3 items-center'>
+  <div className='flex items-center justify-center space-x-3'>
     {icon}
     {label ? <div>{label}</div> : null}
   </div>
@@ -35,6 +36,7 @@ export const Button = ({
   outline = false,
   semitransparent = false,
   circle = false,
+  disabled = false,
   icon, // its worth to pass w-5 h-5 in svg element
   label,
   onClick,
@@ -82,27 +84,19 @@ export const Button = ({
     [variant, semitransparent, outline, circle, center, padding, shadow],
   )
 
-  return _isDiv ? (
-    <div
+  const Tag = useMemo(() => (_isDiv ? 'div' : 'button'), [_isDiv])
+
+  return (
+    <Tag
       className={`${cn(
         className,
         classes,
-      )} group relative h-12 select-none overflow-hidden transition-all duration-100 active:translate-y-[1px] active:shadow-none cursor-pointer touch-manipulation`}
+        disabled && 'pointer-events-none opacity-60',
+      )} group relative h-12 cursor-pointer touch-manipulation select-none overflow-hidden transition-all duration-100 active:translate-y-[1px] active:shadow-none`}
       onTouchStart={undefined}
       onClick={e => onClick?.(e)}
     >
       <ButtonLabelBuilder label={label} icon={icon} />
-    </div>
-  ) : (
-    <button
-      className={`${cn(
-        className,
-        classes,
-      )} group relative h-12 select-none overflow-hidden transition-all duration-100 active:translate-y-[1px] active:shadow-none cursor-pointer touch-manipulation`}
-      onTouchStart={undefined}
-      onClick={e => onClick?.(e)}
-    >
-      <ButtonLabelBuilder label={label} icon={icon} />
-    </button>
+    </Tag>
   )
 }

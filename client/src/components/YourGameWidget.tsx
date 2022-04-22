@@ -1,5 +1,5 @@
 import { Button } from '@/ui/Button'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AtSymbolIcon,
   LockClosedIcon,
@@ -12,14 +12,14 @@ import { withApp } from '@/hoc/withApp'
 import { DetailedRoom, Room, RoomSection } from '@apchi/shared'
 import { useAuth } from '@/hooks/useAuth'
 import { useRecoilState } from 'recoil'
-import { inGameStateStore, roomCurrentStore } from '@/store/room.store'
+import { inRoomStateStore, roomCurrentStore } from '@/store/room.store'
 import { Input } from '@/ui/Input'
 import { UserGroupIcon, ShareIcon } from '@heroicons/react/solid'
 import { copyToClipboard } from '@/utils/copyToClipboard'
 import { useNotify } from '@/hooks/useNotify'
 
 export const YourGameWidget = withApp(({ app }) => {
-  const [inGameState, setInGameState] = useRecoilState(inGameStateStore)
+  const [inRoomState, setInRoomState] = useRecoilState(inRoomStateStore)
   const [room, setRoom] = useRecoilState(roomCurrentStore)
   const {
     userId,
@@ -28,6 +28,11 @@ export const YourGameWidget = withApp(({ app }) => {
   const joinInput = useRef<HTMLInputElement>(null)
   const [joinGameState, setJoinGameState] = useState<string>('')
   const { push } = useNotify()
+
+  const isOwner = useMemo(
+    () => room?.owner.userId === userId,
+    [userId, room?.owner.userId],
+  )
 
   useEffect(() => {
     const offUpdate = app.on<RoomSection>(
@@ -54,7 +59,7 @@ export const YourGameWidget = withApp(({ app }) => {
     const offRoomClosed = app.on<RoomSection>('@room/roomClosed', () => {
       console.log('room closed, kiss my ass')
       setRoom(undefined)
-      setInGameState(false)
+      setInRoomState(false)
     })
     return () => {
       offUpdate()
@@ -69,7 +74,7 @@ export const YourGameWidget = withApp(({ app }) => {
       .service<Room>('rooms')
       .create({ name: `Комната ${userName}` } as Room)
       .then(r => setRoom(r as unknown as DetailedRoom))
-      .then(() => setInGameState(true))
+      .then(() => setInRoomState(true))
   }, [userName])
 
   const joinGame = useCallback(() => {
@@ -81,7 +86,7 @@ export const YourGameWidget = withApp(({ app }) => {
       .service<Room>('rooms')
       .call('join', joinInput.current?.value)
       .then(r => setRoom(r as unknown as DetailedRoom))
-      .then(() => setInGameState(true))
+      .then(() => setInRoomState(true))
       .catch(e => {
         if (e.code === 404) {
           setJoinGameState('Игра не найдена')
@@ -90,12 +95,18 @@ export const YourGameWidget = withApp(({ app }) => {
   }, [joinInput])
 
   const leaveRoom = useCallback(() => {
+    if (isOwner) {
+      const confirm = window.confirm(
+        'Вы действительно хотите удалить это говно?',
+      )
+      if (!confirm) return
+    }
     app
       .service<Room>('rooms')
       .call('leave')
       .then(r => console.log(r))
-      .then(() => setInGameState(false))
-  }, [])
+      .then(() => setInRoomState(false))
+  }, [isOwner])
 
   const renameRoom = useCallback(() => {
     const newName = window
@@ -125,19 +136,19 @@ export const YourGameWidget = withApp(({ app }) => {
   )
 
   useEffect(() => {
-    setInGameState(!!room)
+    setInRoomState(!!room)
   }, []) // no deps
 
-  return inGameState ? (
+  return inRoomState ? (
     <Section
       title='Текущая игра'
-      sideTitle={
+      side={
         <div className='flex items-center space-x-2 px-1'>
           {room?.code ? (
             <div className='flex items-center'>
-              <ShareIcon className='w-5 h-5 text-zinc-400 p-1' />
+              <ShareIcon className='h-5 w-5 p-1 text-zinc-400' />
               <span
-                className='uppercase text-blue-400 font-mono media-hover:cursor-pointer'
+                className='media-hover:cursor-pointer font-mono uppercase text-blue-400'
                 onClick={e =>
                   e.currentTarget.textContent &&
                   copyToClipboard(e.currentTarget.textContent.toUpperCase())
@@ -148,39 +159,40 @@ export const YourGameWidget = withApp(({ app }) => {
             </div>
           ) : null}
           <div className='flex items-center '>
-            <UserGroupIcon className='text-current w-5 h-5 p-1' />
+            <UserGroupIcon className='h-5 w-5 p-1 text-current' />
             <span>{room?.members?.length || 0}</span>
           </div>
         </div>
       }
     >
-      <div className='flex justify-between items-center text-2xl text-zinc-700'>
-        <span className='max-w-[calc(100%-4rem)] text-ellipsis overflow-hidden whitespace-nowrap px-0.5'>
+      <div className='flex items-center justify-between text-2xl text-zinc-700'>
+        <span className='max-w-[calc(100%-4rem)] overflow-hidden text-ellipsis whitespace-nowrap px-0.5'>
           {room?.name || 'Unknown'}
         </span>
-        <div className='flex items-center justify-end h-8'>
+        <div className='flex h-8 items-center justify-end'>
           {room?.owner.userId === userId ? (
             <PencilIcon
-              className='text-gray-500 p-1.5 h-full media-hover:cursor-pointer'
+              className='media-hover:cursor-pointer h-full p-1.5 text-gray-500'
               onClick={() => renameRoom()}
             />
           ) : null}
           {room?.isOpen ? (
             <LockOpenIcon
-              className='text-gray-500 p-1.5 h-full  media-hover:cursor-pointer'
+              className='media-hover:cursor-pointer h-full p-1.5  text-gray-500'
               onClick={allowIfOwner(changeOpenState(false))}
             />
           ) : (
             <LockClosedIcon
-              className='text-gray-500 p-1.5 h-full  media-hover:cursor-pointer'
+              className='media-hover:cursor-pointer h-full p-1.5  text-gray-500'
               onClick={allowIfOwner(changeOpenState(true))}
             />
           )}
         </div>
       </div>
       <Button
-        label='Покинуть игру'
-        variant='primary'
+        label={isOwner ? 'Удалить комнату' : 'Покинуть комнату'}
+        variant={isOwner ? 'error' : 'primary'}
+        outline={true}
         className='w-full'
         onClick={() => {
           leaveRoom()
@@ -190,9 +202,9 @@ export const YourGameWidget = withApp(({ app }) => {
   ) : (
     <>
       <Section title='Текущая игра'>
-        <span className='text-2xl text-zinc-700 px-0.5'>Нет игры</span>
+        <span className='px-0.5 text-2xl text-zinc-700'>Нет игры</span>
         <Button
-          icon={<PlusIcon className='text-white w-5 h-5' />}
+          icon={<PlusIcon className='h-5 w-5 text-white' />}
           label='Создать игру'
           variant='primary'
           className='w-full'
@@ -204,7 +216,7 @@ export const YourGameWidget = withApp(({ app }) => {
 
       <Section
         title='Присоединиться к игре'
-        sideTitle={
+        side={
           <div className='flex items-center space-x-2'>
             {joinGameState ? (
               <span className='text-red-400'>{joinGameState}</span>
@@ -218,7 +230,7 @@ export const YourGameWidget = withApp(({ app }) => {
           inputClassName='uppercase'
         />
         <Button
-          icon={<AtSymbolIcon className='text-white w-5 h-5' />}
+          icon={<AtSymbolIcon className='h-5 w-5 text-white' />}
           label='Присоединиться'
           variant='primary'
           className='w-full'

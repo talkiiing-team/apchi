@@ -44,14 +44,14 @@ const Option = ({
   const navigate = useNavigate()
   return (
     <div
-      className='h-full w-20 flex flex-col items-center justify-center space-y-0.5 px-1 py-1 cursor-pointer'
+      className='flex h-full w-20 cursor-pointer flex-col items-center justify-center space-y-0.5 px-1 py-1'
       onClick={() => {
         navigate(link)
       }}
     >
       <Icon
-        className={`w-8 h-8 will-change-transform transition-transform stroke-1  ${
-          active ? 'text-violet-500' : 'text-violet-400 scale-90'
+        className={`h-8 w-8 stroke-1 transition-transform will-change-transform  ${
+          active ? 'text-violet-500' : 'scale-90 text-violet-400'
         }`}
       />
       {/*<span
@@ -80,8 +80,8 @@ export const Navbar = () => {
   }, [section])
 
   return isAuth ? null : (
-    <div className='fixed bottom-[env(safe-area-inset-bottom)] left-0 w-full h-[4rem] bg-white shadow-up px-1 py-1'>
-      <div className='mx-auto h-full max-w-[450px] flex justify-around items-center items-center'>
+    <div className='shadow-up fixed bottom-0 left-0 w-full bg-white px-1 pb-[env(safe-area-inset-bottom)]'>
+      <div className='mx-auto flex h-[4rem] max-w-[450px] items-center justify-around'>
         {options.map(v => (
           <Option key={v.badgeKey} {...v} active={section === v.link} />
         ))}

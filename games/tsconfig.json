@@ -4,12 +4,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "module": "esnext",
+    "target": "ESNext",
     "strict": true,
-    "module": "esnext",
     "baseUrl": ".",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "types": ["vite/client", "@types/node"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.json"]
 }

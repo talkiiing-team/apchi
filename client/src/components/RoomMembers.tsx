@@ -39,7 +39,7 @@ export const RoomMembers = memo<
   return (
     <Section
       title='Участники'
-      sideTitle={<span className='px-1'>{members?.length || null}</span>}
+      side={<span className='px-1'>{members?.length || null}</span>}
     >
       {content}
     </Section>

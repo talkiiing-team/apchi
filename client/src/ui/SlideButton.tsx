@@ -20,9 +20,10 @@ export const SlideButton = ({
     () => (
       <button
         className={`${cn({
-          'h-[200%] w-full flex-col group-hover:-top-full': scroll === 'bottom',
-          'h-full w-[200%] flex-row group-hover:-left-full': scroll === 'right',
-        })} absolute top-0 left-0 right-0 bottom-0 flex transition-all duration-300 ease-in-out`}
+          'h-[200%] w-full group-hover:-top-full': scroll === 'bottom',
+          'flex h-full w-[200%] flex-row group-hover:-left-full':
+            scroll === 'right',
+        })} border-inset absolute top-0 left-0 right-0 bottom-0 transition-all duration-300 ease-in-out`}
       >
         <div
           className={`${cn({

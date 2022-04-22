@@ -6,4 +6,5 @@ export enum RoomSection {
   newPublicRooms = 'newPublicRooms',
   roomClosed = 'roomClosed',
   gameSelected = 'gameSelected',
+  gameStart = 'gameStart',
 }

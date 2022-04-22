@@ -3,8 +3,8 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "module": "ESNext",
     "target": "ESNext",
-    "module": "NodeNext",
     "strict": true,
     "baseUrl": ".",
     "moduleResolution": "Node",
@@ -17,6 +17,9 @@
   "references": [
     {
       "path": "../shared/tsconfig.json"
+    },
+    {
+      "path": "../games/tsconfig.json"
     }
   ],
   "include": ["src/**/*.ts", "vite.config.ts"]

@@ -44,12 +44,12 @@ export const Login = () => {
   return (
     <>
       <div className='flex flex-col items-center space-y-2 p-2'>
-        <h2 className='font-fancy text-3xl text-center'>Привет!</h2>
-        <h4 className='font-fancy text-xl text-center'>
+        <h2 className='text-center font-sans text-3xl font-light'>Привет!</h2>
+        <h4 className='text-center font-sans text-xl font-light'>
           Нужно войти, чтобы продолжить
         </h4>
         <span
-          className='font-sans text-blue-500 media-hover:hover:text-blue-600 cursor-pointer select-none'
+          className='media-hover:hover:text-blue-600 cursor-pointer select-none font-sans text-blue-500'
           onClick={() => navigate('register')}
         >
           Я еще не зарегистрирован
@@ -69,13 +69,14 @@ export const Login = () => {
         <SlideButton
           onClick={handleSubmit(onSubmit)}
           label='Войти'
-          icon={<LoginIcon className='w-5 h-5 text-white stroke-1' />}
-          subIcon={<ArrowRightIcon className='w-5 h-5 text-white stroke-1' />}
-          className='rounded-xl !mt-6'
+          icon={<LoginIcon className='h-5 w-5 stroke-1 text-white' />}
+          subIcon={<ArrowRightIcon className='h-5 w-5 stroke-1 text-white' />}
+          className='!mt-6 rounded-xl'
+          scroll='right'
         />
       </form>
       {errors.password?.message ? (
-        <span className='text-rose-400 w-full text-center'>
+        <span className='w-full text-center text-rose-400'>
           Неправильный пароль, попробуйте еще раз
         </span>
       ) : null}

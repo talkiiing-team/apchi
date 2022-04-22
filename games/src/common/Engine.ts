@@ -1,4 +1,5 @@
-import { User } from '@apchi/shared'
+import { CrudStorage, User } from '@apchi/shared'
+import { sendToRoom } from '@apchi/poke/src/daemon/general.daemon'
 
 export enum GameStatus {
   Idle = 'Idle',
@@ -13,6 +14,11 @@ export type Leaderboard = Record<string, number>
 
 export type ExtendedState<State> = State & {
   leaderboard: Leaderboard
+}
+
+export type EngineUtils = {
+  sendToRoom: (event: string, ...args: any[]) => boolean
+  sendToUser: (userId: User['userId'], event: string, ...args: any[]) => void
 }
 
 export const UnsafeKeys = ['innerData'] as const
@@ -34,8 +40,9 @@ const createProxyValidator = (callbacks: CallableFunction[]) => {
       return inner
     },
     set(target: any, key: any, value: any) {
+      const oldValue = target[key]
       target[key] = value
-      callbacks.forEach(callback => callback(key, value))
+      callbacks.forEach(callback => callback(key, oldValue, value))
       return true
     },
   }
@@ -53,6 +60,8 @@ export abstract class Engine<State extends object> {
   private callbacks: CallableFunction[] = []
 
   status: GameStatus = GameStatus.Idle
+
+  protected STORAGE: CrudStorage = {}
 
   /**
    * State that can be safely sent to the client
@@ -72,10 +81,14 @@ export abstract class Engine<State extends object> {
   /**
    * @return invalidation function
    */
-  protected abstract onStateChange(): CallableFunction | void
+  protected abstract onStateChange(
+    changedField: string,
+    oldValue: any,
+    newValue: any,
+  ): CallableFunction | void
 
-  addUsers(users: User[]) {
-    this.users = [...this.users, ...users]
+  setUsers(users: User[]) {
+    this.users = users
   }
 
   removeUser(userId: User['userId']) {
@@ -94,13 +107,25 @@ export abstract class Engine<State extends object> {
     this.onGameFinish()
   }
 
+  abstract applyAction(user: User, action: string, ...args: any[]): any
+
   protected abstract onGameStart(): void
+
   protected abstract onGameFinish(): void
 
-  constructor(initialState: State, initialProperties: { users: Users }) {
+  protected sendToRoom: EngineUtils['sendToRoom']
+  protected sendToUser: EngineUtils['sendToUser']
+
+  protected constructor(
+    initialState: State,
+    initialProperties: { users: Users },
+    engineUtils: EngineUtils,
+  ) {
     this.users = initialProperties.users
     this.state = new Proxy(initialState, createProxyValidator(this.callbacks))
     this.registerStateChangeCallback(this.onStateChange.bind(this))
+    this.sendToRoom = engineUtils.sendToRoom
+    this.sendToUser = engineUtils.sendToUser
   }
 }
 

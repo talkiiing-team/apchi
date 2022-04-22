@@ -14,19 +14,22 @@ import {
   populateUser,
   roomMembersPopulate,
 } from '@/common/roomMembersPopulate'
-import { DetailedRoom, Room, Section, User } from '@apchi/shared'
+import { Crud, DetailedRoom, Room, Section, User } from '@apchi/shared'
 import { createRoomHash } from '@/utils/createRoomHash'
 import { buildLobbyName } from '@/utils/buildLobbyName'
 import { fakeUser } from '@/dataUtils/fakeUser'
 import userStore from '@/store/user.store'
 import { Game } from '@apchi/shared/src/models/Game.model'
 import {
-  getGamesIds,
-  getGamesList,
+  GeneralDaemon,
+  sendToRoom,
+  sendToUser,
   setRoomEngine,
 } from '@/daemon/general.daemon'
-import { games } from '@apchi/games'
-
+import { getGamesIds } from '@apchi/games'
+import { SocketAuth } from '@/models/SocketAuth.model'
+import authenticationStore from '@/store/authentication.store'
+import socketAuthStore from '@/store/socketAuth.store'
 const basePrefix = 'rooms'
 const prefix = buildPrefix(basePrefix)
 
@@ -334,8 +337,6 @@ export const registerRoomsController: Controller = (io: Server) => {
           game: gameId === null ? undefined : gameId,
         }))
 
-        if (gameId !== null) setRoomEngine(roomIdSubmit, gameId)
-
         io.in(buildRoomName(roomIdSubmit)).emit(
           buildBroadcastEventName(Section.Room)(RoomSection.gameSelected),
           { game: gameId },
@@ -343,5 +344,52 @@ export const registerRoomsController: Controller = (io: Server) => {
         return emit(prefix('selectGame.done'), sock)(result)
       },
     )
+
+    listeners.set(prefix('startGame'), (roomId: Room['id']) => {
+      const user = getContextUser(sock)
+      if (!exists(user))
+        return emit(
+          prefix('startGame.err'),
+          sock,
+        )({ reason: 'Forbidden', code: 403 })
+
+      const room = roomStore.find(
+        room => room.id === roomId && room.owner === user.userId,
+      )
+      if (!exists(room))
+        return emit(
+          prefix('startGame.err'),
+          sock,
+        )({ reason: "You're not an admin", code: 403 })
+
+      if (!room.game || room.game?.length === 0)
+        return emit(
+          prefix('startGame.err'),
+          sock,
+        )({ reason: 'Select Room first', code: 400 })
+
+      setRoomEngine(room.id, room.game, {
+        sendToRoom: sendToRoom(io, room.id),
+        sendToUser: sendToUser(io, socketAuthStore),
+      })
+
+      const engine = GeneralDaemon.get(room.id)
+      if (!engine)
+        return emit(
+          prefix('startGame.err'),
+          sock,
+        )({ reason: 'Internal error, game engine not found', code: 500 })
+
+      engine.setUsers(roomMembersPopulate(room.members))
+
+      io.in(buildRoomName(room.id)).emit(
+        buildBroadcastEventName(Section.Room)(RoomSection.gameStart),
+        { game: room.game },
+      )
+
+      engine.startGame()
+
+      return emit(prefix('startGame.done'), sock)()
+    })
   }
 }

@@ -6,7 +6,7 @@ export const roomCurrentStore = atom<DetailedRoom | undefined>({
   default: undefined,
 })
 
-export const inGameStateStore = atom<boolean>({
-  key: 'inGameStateStore',
+export const inRoomStateStore = atom<boolean>({
+  key: 'inRoomStateStore',
   default: false,
 })

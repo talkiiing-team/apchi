@@ -4,7 +4,7 @@ import { emit } from '@/utils/emit'
 import { getContextUser, getContextUserId } from '@/utils/getContext'
 import { Controller } from '@/types'
 import { exists } from '@/utils/controllerUtils'
-import { getGamesList } from '@/daemon/general.daemon'
+import { getGamesList } from '@apchi/games'
 
 const basePrefix = 'games'
 const prefix = buildPrefix(basePrefix)

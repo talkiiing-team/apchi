@@ -14,8 +14,14 @@
     "paths": {
       "@apchi/shared": ["shared/src/index.ts"],
       "@apchi/games": ["games/src/index.ts"]
-    }
+    },
+    "composite": true
   },
-  "include": ["poke/**/*.ts"],
+  "include": [
+    "poke/**/*.ts",
+    "client/**/*.ts",
+    "games/**/*.ts",
+    "shared/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,5 @@
 {
-  "watch": ["src"],
+  "watch": ["src", "../shared/src", "../games/src"],
   "ext": "ts",
   "exec": "clear && vite-node src/index.ts"
 }

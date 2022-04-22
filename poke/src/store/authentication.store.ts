@@ -1,4 +1,4 @@
-import { useTable } from '@/common/useTable'
+import { useTable } from '@/store/store'
 import { Credentials, credentialsPrimaryKey } from '@apchi/shared'
 
 export const authenticationStore = useTable<
