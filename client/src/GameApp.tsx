@@ -21,9 +21,7 @@ import { NotifyRoot } from '@/components/NotifyRoot'
 import { inGameStateStore } from '@/store/game.store'
 import { ChevronLeftIcon } from '@heroicons/react/outline'
 
-const App = withApp(({ app }) => {
-  const location = useLocation()
-  const navigate = useNavigate()
+const GameApp = withApp(({ app }) => {
   const { user, authenticated } = useAuth(true)
   const loginState = useRecoilValue(loginStateStore)
   const [inGameState, setInGameState] = useRecoilState(inGameStateStore)
@@ -40,15 +38,6 @@ const App = withApp(({ app }) => {
         }),
     [],
   )
-
-  useEffect(() => {
-    console.log('auth', authenticated)
-    const globalUnSubscriber = () => {
-      leaveGame().then(r => console.log('left room in cause of session end'))
-    }
-    window.addEventListener('close', globalUnSubscriber)
-    return globalUnSubscriber
-  }, [authenticated])
 
   const leaveGameButton = useMemo(
     () => (
@@ -78,4 +67,4 @@ const App = withApp(({ app }) => {
   )
 })
 
-export default App
+export default GameApp

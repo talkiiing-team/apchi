@@ -1,5 +1,4 @@
-import { CrudStorage, User } from '@apchi/shared'
-import { sendToRoom } from '@apchi/poke/src/daemon/general.daemon'
+import { CrudStorage, Game, User } from '@apchi/shared'
 
 export enum GameStatus {
   Idle = 'Idle',
@@ -59,7 +58,11 @@ export abstract class Engine<State extends object> {
 
   private callbacks: CallableFunction[] = []
 
-  status: GameStatus = GameStatus.Idle
+  private status: GameStatus = GameStatus.Idle
+
+  get gameStatus(): GameStatus {
+    return this.status
+  }
 
   protected STORAGE: CrudStorage = {}
 
@@ -69,7 +72,9 @@ export abstract class Engine<State extends object> {
   get safeState(): Omit<State, UnsafeFields> {
     return Object.fromEntries(
       Object.entries(this.state).filter(
-        ([key]) => !(UnsafeKeys as unknown as string[]).includes(key),
+        ([key]) =>
+          !(UnsafeKeys as unknown as string[]).includes(key) &&
+          !key.includes('Stor'), // Store | Storage,
       ),
     ) as Omit<State, UnsafeFields>
   }
@@ -106,6 +111,8 @@ export abstract class Engine<State extends object> {
     this.status = GameStatus.Finished
     this.onGameFinish()
   }
+
+  abstract gameId: Game['id']
 
   abstract applyAction(user: User, action: string, ...args: any[]): any
 

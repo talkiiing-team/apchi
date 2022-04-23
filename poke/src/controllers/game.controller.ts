@@ -12,7 +12,7 @@ import roomStore from '@/store/room.store'
 const basePrefix = 'game'
 const prefix = buildPrefix(basePrefix)
 
-export const registerGamesController: Controller = (io: Server) => {
+export const registerGameController: Controller = (io: Server) => {
   return (sock: Socket, listeners) => {
     listeners.set(
       prefix('do'),
@@ -40,5 +40,25 @@ export const registerGamesController: Controller = (io: Server) => {
         return emit(prefix('do.done'), sock)()
       },
     )
+
+    listeners.set(prefix('getState'), (roomId: Room['id']) => {
+      const user = getContextUser(sock)
+      if (!exists(user))
+        return emit(
+          prefix('getState.err'),
+          sock,
+        )({ reason: 'Forbidden', code: 403 })
+
+      if (!roomStore.get(roomId)) {
+        return emit(
+          prefix('getState.err'),
+          sock,
+        )({ reason: 'No room found', code: 404 })
+      }
+
+      const result = GeneralDaemon.get(roomId)?.safeState
+
+      return emit(prefix('getState.done'), sock)(result)
+    })
   }
 }

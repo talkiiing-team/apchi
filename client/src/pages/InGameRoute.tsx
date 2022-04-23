@@ -24,7 +24,7 @@ export const InGameRoute = () => {
     () =>
       inGameState && room?.game ? (
         <div className='flex h-full w-full grow flex-col overflow-x-hidden overflow-y-hidden'>
-          <GameView gameId={room?.game} />
+          <GameView gameId={room?.game} roomId={room.id} />
         </div>
       ) : (
         <div className='flex h-full w-full grow flex-col items-center justify-center'>

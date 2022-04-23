@@ -27,37 +27,6 @@ const App = withApp(({ app }) => {
 
   const { viewWidth } = useAdaptivity()
 
-  useEffect(() => {
-    console.log('auth', authenticated)
-    const globalUnSubscriber = () => {
-      app
-        .service('rooms')
-        .call('leave')
-        .then(r => console.log('left room in cause of session end'))
-    }
-    window.addEventListener('close', globalUnSubscriber)
-    return globalUnSubscriber
-  }, [authenticated])
-
-  useEffect(() => {
-    if (!authenticated) {
-      if (location.pathname.split('/')[1] !== 'auth') {
-        navigate('/auth')
-      }
-    } else {
-    }
-  }, [location.pathname, authenticated])
-
-  useEffect(() => {
-    if (loginState === LoginState.NeedRegister) {
-      navigate('/auth/register')
-    } else if (loginState === LoginState.NeedLogin) {
-      navigate('/auth')
-    } else if (loginState === LoginState.Authenticated) {
-      navigate('/')
-    }
-  }, [loginState])
-
   return (
     <AppRoot>
       <SplitLayout header={<PanelHeader separator={false} />}>

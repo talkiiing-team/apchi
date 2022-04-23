@@ -26,7 +26,7 @@ import {
   sendToUser,
   setRoomEngine,
 } from '@/daemon/general.daemon'
-import { getGamesIds } from '@apchi/games'
+import { GameStatus, getGamesIds } from '@apchi/games'
 import { SocketAuth } from '@/models/SocketAuth.model'
 import authenticationStore from '@/store/authentication.store'
 import socketAuthStore from '@/store/socketAuth.store'
@@ -344,6 +344,39 @@ export const registerRoomsController: Controller = (io: Server) => {
         return emit(prefix('selectGame.done'), sock)(result)
       },
     )
+
+    listeners.set(prefix('gameStatus'), (roomId: Room['id']) => {
+      const user = getContextUser(sock)
+      if (!exists(user))
+        return emit(
+          prefix('gameStatus.err'),
+          sock,
+        )({ reason: 'Forbidden', code: 403 })
+
+      const room = roomStore.find(
+        room => room.id === roomId && room.owner === user.userId,
+      )
+      if (!exists(room) || !room.game || room.game?.length === 0)
+        return emit(
+          prefix('gameStatus.err'),
+          sock,
+        )({ reason: 'Join room first', code: 400 })
+
+      const engine = GeneralDaemon.get(room.id)
+      if (!engine)
+        return emit(
+          prefix('gameStatus.err'),
+          sock,
+        )({ reason: 'Game not started', code: 400 })
+
+      return emit(
+        prefix('gameStatus.done'),
+        sock,
+      )({
+        status: engine.gameStatus,
+        game: engine.gameId,
+      })
+    })
 
     listeners.set(prefix('startGame'), (roomId: Room['id']) => {
       const user = getContextUser(sock)

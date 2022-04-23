@@ -1,7 +1,6 @@
 import { withApp } from '@/hoc/withApp'
 import { memo, useMemo, Suspense, lazy } from 'react'
-import { Game } from '@apchi/shared'
-import { Loader } from '@/ui/Loader'
+import { Game, Room } from '@apchi/shared'
 import { CubeTransparentIcon } from '@heroicons/react/outline'
 
 const BaseNoGameFallback = () => {
@@ -16,32 +15,34 @@ const BaseNoGameFallback = () => {
 }
 
 export const GameView = memo(
-  withApp<{ gameId: Game['id'] }>(({ app, gameId }) => {
-    const GameComponent = useMemo(() => {
-      return lazy(
-        () =>
-          new Promise(res => {
-            import(`../games/${gameId}/index.ts`)
-              .catch(r => ({
-                default: BaseNoGameFallback,
-              }))
-              .then(r => setTimeout(() => res(r), 5000))
-          }),
+  withApp<{ gameId: Game['id']; roomId: Room['id'] }>(
+    ({ app, gameId, roomId }) => {
+      const GameComponent = useMemo(() => {
+        return lazy(
+          () =>
+            new Promise(res => {
+              import(`../games/${gameId}/index.ts`)
+                .catch(r => ({
+                  default: BaseNoGameFallback,
+                }))
+                .then(r => setTimeout(() => res(r), 2000))
+            }),
+        )
+      }, []) // no deps
+
+      console.log('GameView ')
+
+      return (
+        <Suspense
+          fallback={
+            <div className='flex h-full w-full grow flex-col items-center justify-center'>
+              <CubeTransparentIcon className='h-12 w-12 animate-spin stroke-1 text-zinc-500' />
+            </div>
+          }
+        >
+          <GameComponent roomId={roomId} />
+        </Suspense>
       )
-    }, []) // no deps
-
-    console.log('GameView ')
-
-    return (
-      <Suspense
-        fallback={
-          <div className='flex h-full w-full grow flex-col items-center justify-center'>
-            <CubeTransparentIcon className='h-12 w-12 animate-spin stroke-1 text-zinc-500' />
-          </div>
-        }
-      >
-        <GameComponent />
-      </Suspense>
-    )
-  }),
+    },
+  ),
 )

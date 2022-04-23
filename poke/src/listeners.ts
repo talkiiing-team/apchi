@@ -4,6 +4,7 @@ import { registerRoomsController } from '@/controllers/rooms.controller'
 import { registerAuthenticateController } from '@/controllers/authentication.controller'
 import { registerControllers } from '@/common/registerController'
 import { registerGamesController } from '@/controllers/games.controller'
+import { registerGameController } from '@/controllers/game.controller'
 
 export const registerListeners = (io: Server) => {
   io.on('connection', sock => {
@@ -12,6 +13,7 @@ export const registerListeners = (io: Server) => {
       registerRoomsController,
       registerAuthenticateController,
       registerGamesController,
+      registerGameController,
     ])
   })
 }

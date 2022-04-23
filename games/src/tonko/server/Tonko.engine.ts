@@ -34,6 +34,12 @@ export type UserGameData = {
   score: number
 }
 
+export type JokeSubmissionData = {
+  id: number
+  userId: User['userId']
+  joke: Joke
+}
+
 export type JokeRatingGameData = {
   id: Joke['id']
   upVotes: User['userId'][]
@@ -47,9 +53,15 @@ export type TonkoState = {
   userGameStore?: Crud<UserGameData, 'userId'>
   jokeStorage?: Crud<Joke, 'id'>
   jokeRatingStorage?: Crud<JokeRatingGameData, 'id'>
+  jokeSubmissionStorage?: Crud<JokeSubmissionData, 'id'>
+}
+
+export enum Actions {
+  AnswerJoke = 'answerJoke',
 }
 
 export class TonkoEngine extends Engine<TonkoState> {
+  gameId = 'tonko'
   static meta: Game = {
     id: 'tonko',
     name: 'Tonko',
@@ -60,6 +72,9 @@ export class TonkoEngine extends Engine<TonkoState> {
 
   protected onGameStart() {
     this.state.stage = Stage.Starting
+    this.sendToRoom(buildTonkoGameEvent(TonkoGameEvent.StageChange), {
+      stage: Stage.Starting,
+    })
     const jokeSlice = getJokeSets(
       this.users.length,
       shuffle(jokeList.slice(0, this.users.length)),
@@ -82,18 +97,21 @@ export class TonkoEngine extends Engine<TonkoState> {
     newValue: any,
   ): Function | void {
     console.log(
-      `[${new Date().toLocaleTimeString()}]: [\u001b[33mTonko\u001b[0m] Updated [${key}] ${oldValue} → ${newValue}`,
+      `[${new Date().toLocaleTimeString()}]: [\u001b[33mTonko\u001b[0m] State updated [${key}] ${oldValue} → ${newValue}`,
     )
     if (key === 'stage') {
       switch (newValue) {
         case Stage.Punching: {
-          this.state.userGameStore!.forEach(user =>
+          this.sendToRoom(buildTonkoGameEvent(TonkoGameEvent.StageChange), {
+            stage: Stage.Punching,
+          })
+          this.state.userGameStore!.forEach(user => {
             this.sendToUser(
               user.userId,
               buildTonkoGameEvent(TonkoGameEvent.ReceivePunchesToAnswer),
-              jokeList.filter(joke => user.jokes?.includes(joke.id)),
-            ),
-          )
+              { jokes: jokeList.filter(joke => user.jokes?.includes(joke.id)) },
+            )
+          })
           break
         }
       }
@@ -102,7 +120,16 @@ export class TonkoEngine extends Engine<TonkoState> {
 
   protected onGameFinish(): void {}
 
-  public applyAction(user: User, action: string, ...args: any[]): any {}
+  public applyAction(user: User, action: Actions, ...args: any[]): any {
+    if (action === Actions.AnswerJoke) {
+      const joke = args[0] as Joke
+      const newSubmission = this.state.jokeSubmissionStorage!.create({
+        userId: user.userId,
+        joke: joke,
+      })
+      console.log('New submission registered', JSON.stringify(newSubmission))
+    }
+  }
 
   constructor(utils: EngineUtils) {
     const initialState: TonkoState = {
@@ -117,5 +144,9 @@ export class TonkoEngine extends Engine<TonkoState> {
     this.state.userGameStore = this.useTable('userGameStore', 'userId')
     this.state.jokeStorage = this.useTable('jokeStore', 'id')
     this.state.jokeRatingStorage = this.useTable('jokeRatingStore', 'id')
+    this.state.jokeSubmissionStorage = this.useTable(
+      'jokeSubmissionStorage',
+      'id',
+    )
   }
 }

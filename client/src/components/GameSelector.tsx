@@ -9,7 +9,7 @@ import { NativeSelect } from '@vkontakte/vkui'
 import { useAuth } from '@/hooks/useAuth'
 import { useNotify } from '@/hooks/useNotify'
 import { Button } from '@/ui/Button'
-import { getGamesMap } from '@apchi/games'
+import { GameStatus, getGamesMap } from '@apchi/games'
 import { set } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { inGameStateStore } from '@/store/game.store'
@@ -91,6 +91,23 @@ export const GameSelector = withApp(({ app }) => {
         setGamesList(r)
       })
   }, [])
+
+  useEffect(() => {
+    if (room?.game) {
+      app
+        .service('rooms')
+        .call('gameStatus', room.id)
+        .then(({ status, game }: { status: GameStatus; game: Game['id'] }) => {
+          if (room.game !== game) {
+            setRoom(r => (room ? { ...room, game: game } : undefined))
+          }
+          if (status === GameStatus.InProgress) {
+            setInGameState(true)
+            navigate('game')
+          }
+        })
+    }
+  }, []) // no deps
 
   const gamesOptions = useMemo(
     () =>

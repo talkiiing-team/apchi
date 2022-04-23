@@ -6,6 +6,8 @@ export enum TonkoGameEvent {
   VoteForPunch = 'voteForPunch', // 2 punches for the same setup, you'll need to send Vote
   VoteAccepted = 'voteAccepted',
   SeeVotes = 'seeVotes',
+  StageChange = 'stageChange',
+  RoundChange = 'roundChange',
 }
 
 export enum Stage {
@@ -18,6 +20,6 @@ export enum Stage {
 
 export const buildTonkoGameEvent = (
   eventName: TonkoGameEvent,
-): TonkoGameEventType => `@tonkoGame/${eventName}`
+): TonkoGameEventType => `@game/${eventName}`
 
-export type TonkoGameEventType = `@tonkoGame/${TonkoGameEvent}`
+export type TonkoGameEventType = `@game/${TonkoGameEvent}`
