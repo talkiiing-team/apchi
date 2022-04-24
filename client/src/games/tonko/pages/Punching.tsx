@@ -6,6 +6,7 @@ import { Input } from '@vkontakte/vkui'
 import { Button } from '@/ui/Button'
 import { withApp } from '@/hoc/withApp'
 import { Room } from '@apchi/shared'
+import { ReplyIcon } from '@heroicons/react/outline'
 
 const prepareJokeText = (
   text: Joke['jokeDraft'],
@@ -52,31 +53,56 @@ const JokeView = memo(
 
     const commitAnswerToList = useCallback(() => {
       if (inputRef.current) {
-        const value = inputRef.current.value
+        const value = inputRef.current.value.slice(0, 40)
         setAnswers(ans => [...ans, value || 'Error'])
         inputRef.current.value = ''
       }
     }, [inputRef])
+
+    const dropLastAnswer = useCallback(() => {
+      setAnswers(ans => (ans.length ? ans.slice(0, -1) : []))
+    }, [])
 
     const answerCallback = useCallback(() => {
       answerFn(answers)
     }, [answers])
 
     return (
-      <div className='flex flex-col items-start space-y-1'>
-        <span>{preparedText}</span>
-        {readyToSend ? (
-          <Button label={'Отправить'} onClick={answerCallback} />
-        ) : (
-          <>
-            <Input
-              placeholder='Добивочка'
-              onChange={e => console.log(e.target.value)}
-              getRef={inputRef}
-            />
-            <Button label={'Ответить'} onClick={commitAnswerToList} />
-          </>
+      <div className='flex w-full flex-col items-center space-y-3 p-3'>
+        <span className='w-full text-center'>{preparedText}</span>
+        {!readyToSend && (
+          <Input
+            placeholder='Добивочка'
+            onChange={e => console.log(e.target.value)}
+            getRef={inputRef}
+            className='w-full'
+            maxLength={40}
+          />
         )}
+        <div className='flex w-full items-center space-x-2'>
+          {answersCount ? (
+            <Button
+              icon={<ReplyIcon className='h-5 w-5 stroke-1 text-white' />}
+              className='w-full'
+              variant='error'
+              square
+              onClick={dropLastAnswer}
+            />
+          ) : null}
+          {readyToSend ? (
+            <Button
+              label={'Отправить'}
+              className='w-full'
+              onClick={answerCallback}
+            />
+          ) : (
+            <Button
+              label={'Ответить'}
+              className='w-full'
+              onClick={commitAnswerToList}
+            />
+          )}
+        </div>
       </div>
     )
   },
@@ -138,16 +164,14 @@ export const Punching = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
   )
 
   return (
-    <div>
+    <div className='flex h-full w-full flex-col items-center justify-center space-y-2'>
       {allAnsweredState ? (
-        <div>That's all for now</div>
-      ) : (
-        <div>
-          {currentJoke ? (
-            <JokeView text={currentJoke.jokeDraft} answerFn={answerFn} />
-          ) : null}
+        <div className='animate-pulse text-lg'>
+          Пока на этом все, ждём остальных
         </div>
-      )}
+      ) : currentJoke ? (
+        <JokeView text={currentJoke.jokeDraft} answerFn={answerFn} />
+      ) : null}
     </div>
   )
 })

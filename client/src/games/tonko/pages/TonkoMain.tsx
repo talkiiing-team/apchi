@@ -40,6 +40,7 @@ export const TonkoMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
   }, [])
 
   useEffect(() => {
+    console.log('if not ', gameState, 'we will get data')
     if (!gameState) {
       console.log('getting state')
       app
@@ -47,9 +48,14 @@ export const TonkoMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
         .call('getState', roomId)
         .then(r => {
           console.log(r)
+          setGameState(state => (state ? { ...state, ...r } : r))
         })
     }
   }, [])
+
+  const logState = useCallback(() => {
+    console.log(gameState)
+  }, [gameState])
 
   const ActualComponent = useMemo(() => {
     if (!gameState?.stage) {
@@ -62,12 +68,14 @@ export const TonkoMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
   }, [gameState?.stage])
 
   return (
-    <div className='flex grow flex-col space-y-2 px-2 py-3'>
+    <div className='flex grow basis-0 flex-col space-y-2 px-2 py-3'>
       <StageController />
       <div className='grow bg-zinc-50'>
         <ActualComponent roomId={roomId} />
       </div>
-      <div className='bg-zinc-50'>{JSON.stringify(gameState)}</div>
+      <div className='bg-zinc-50 text-xs text-blue-400' onClick={logState}>
+        Log State
+      </div>
     </div>
   )
 })

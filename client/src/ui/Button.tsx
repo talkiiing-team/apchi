@@ -10,6 +10,7 @@ export interface ButtonProps {
   outline?: boolean
   semitransparent?: boolean
   circle?: boolean
+  square?: boolean
   icon?: JSX.Element | string | number | SVGElement
   label?: JSX.Element | string | number
   onClick?: (e: MouseEvent<HTMLDivElement | HTMLButtonElement>) => void
@@ -36,6 +37,7 @@ export const Button = ({
   outline = false,
   semitransparent = false,
   circle = false,
+  square = false,
   disabled = false,
   icon, // its worth to pass w-5 h-5 in svg element
   label,
@@ -52,6 +54,7 @@ export const Button = ({
           shadow && !outline && !semitransparent,
         border: outline,
         'w-12 rounded-full': circle,
+        'w-12': square,
         'rounded-xl': !circle,
       },
       outline

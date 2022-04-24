@@ -25,7 +25,7 @@ export const GameView = memo(
                 .catch(r => ({
                   default: BaseNoGameFallback,
                 }))
-                .then(r => setTimeout(() => res(r), 2000))
+                .then(r => setTimeout(() => res(r), 200))
             }),
         )
       }, []) // no deps

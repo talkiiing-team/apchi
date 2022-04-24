@@ -1,10 +1,19 @@
 import { useRecoilState } from 'recoil'
 
-import { gameStateStore } from '../store/tonko.store'
-import { useCallback, useEffect } from 'react'
+import { gameStateStore, timeStore } from '../store/tonko.store'
+import { useCallback, useEffect, useMemo } from 'react'
 import { withApp } from '@/hoc/withApp'
-import { TonkoGameEvent } from '@apchi/games'
+import { Stage, TonkoGameEvent } from '@apchi/games'
 import { TonkoClientState } from '@apchi/games/src/tonko/client'
+import { GameClock } from '../components/GameClock'
+
+const gameStageDict: Record<Stage, string> = {
+  off: 'Неактивно',
+  starting: 'Начинаем!',
+  punching: 'Вводите свои ответы',
+  voting: 'Голосуйте!',
+  overviewing: 'Вот так вот',
+}
 
 export const StageController = withApp(({ app }) => {
   const [gameState, setGameState] = useRecoilState(gameStateStore)
@@ -22,9 +31,18 @@ export const StageController = withApp(({ app }) => {
     }
   }, [])
 
+  const showTimer = useMemo(() => {
+    if (!gameState?.stage) return false
+    if ([Stage.Off, Stage.Starting].includes(gameState.stage)) return false
+    return true
+  }, [gameState?.stage])
+
   return (
-    <div className='px-1 text-lg font-bold'>
-      {gameState?.stage || 'Stage not defined'}
+    <div className='flex items-center justify-between px-1 text-lg font-bold'>
+      <span>
+        {gameState?.stage ? gameStageDict[gameState.stage] : 'Ожидание...'}
+      </span>
+      {showTimer ? <GameClock /> : null}
     </div>
   )
 })
