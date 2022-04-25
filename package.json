@@ -9,7 +9,6 @@
   ],
   "description": "Boilerplate for VKMA + pokepoke",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "npm run dev -w client",
     "back": "npm run dev:nodemon -w poke"

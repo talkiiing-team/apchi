@@ -1,10 +1,8 @@
 import { httpServer, io } from './socket'
 
-// @ts-ignore
-// const port = parseInt(import.meta.env.PORT as string) || 3030
-const port = 3030
+const { PORT = '3071' } = process.env
 
-const listener = httpServer.listen(port, '0.0.0.0', () => {
+const listener = httpServer.listen(parseInt(PORT), '0.0.0.0', () => {
   console.log(`Listening on http://0.0.0.0:${(listener.address() as any).port}`)
 
   /* setTimeout(() => {

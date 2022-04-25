@@ -9,13 +9,14 @@ export default defineConfig({
   plugins: [viteTsconfigPaths()],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/app/app.ts'),
+      entry: path.resolve(__dirname, 'src/index.ts'),
       fileName: () => 'index.js',
-      formats: ['es'],
+      formats: ['cjs'],
     },
-    outDir: path.resolve(__dirname, 'api/_build'),
+    outDir: path.resolve(__dirname, './dist'),
+    emptyOutDir: true,
     rollupOptions: {
-      external: [...Object.keys(pkg.dependencies)],
+      external: [...Object.keys(pkg.dependencies), 'http'],
     },
   },
   test: {},
