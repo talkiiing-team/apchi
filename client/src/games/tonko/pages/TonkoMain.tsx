@@ -8,8 +8,11 @@ import { StageController } from '@/games/tonko/components/StageController'
 import { TonkoClientState } from '@apchi/games/src/tonko/client'
 import { Punching } from '@/games/tonko/pages/Punching'
 import { Room } from '@apchi/shared'
+import { Starting } from '@/games/tonko/pages/Starting'
+import { Voting } from '@/games/tonko/pages/Voting'
+import { Overviewing } from '@/games/tonko/pages/Overviewing'
 
-const Awaiting = () => <div>Waiting for data</div>
+const Awaiting = () => <div>Секунду, загрузка продолжается...</div>
 
 export const TonkoMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
   const [gameState, setGameState] = useRecoilState(gameStateStore)
@@ -61,19 +64,31 @@ export const TonkoMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
     if (!gameState?.stage) {
       return Awaiting
     }
+    if (gameState.stage === Stage.Starting) {
+      return Starting
+    }
     if (gameState.stage === Stage.Punching) {
       return Punching
+    }
+    if (gameState.stage === Stage.Voting) {
+      return Voting
+    }
+    if (gameState.stage === Stage.Overviewing) {
+      return Overviewing
     }
     return () => null
   }, [gameState?.stage])
 
   return (
-    <div className='flex grow basis-0 flex-col space-y-2 px-2 py-3'>
+    <div className='flex grow basis-0 flex-col space-y-3 px-2 py-3'>
       <StageController />
-      <div className='grow bg-zinc-50'>
+      <div className='grow'>
         <ActualComponent roomId={roomId} />
       </div>
-      <div className='bg-zinc-50 text-xs text-blue-400' onClick={logState}>
+      <div
+        className='w-full bg-violet-100 py-2 text-center text-xs text-blue-400'
+        onClick={logState}
+      >
         Log State
       </div>
     </div>

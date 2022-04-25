@@ -90,7 +90,7 @@ export abstract class Engine<State extends object> {
     changedField: string,
     oldValue: any,
     newValue: any,
-  ): CallableFunction | void
+  ): CallableFunction | Promise<any> | void
 
   setUsers(users: User[]) {
     this.users = users

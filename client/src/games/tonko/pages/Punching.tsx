@@ -7,20 +7,8 @@ import { Button } from '@/ui/Button'
 import { withApp } from '@/hoc/withApp'
 import { Room } from '@apchi/shared'
 import { ReplyIcon } from '@heroicons/react/outline'
-
-const prepareJokeText = (
-  text: Joke['jokeDraft'],
-  answers: string[],
-): string => {
-  console.log('preparing text')
-  let i = 0
-  return text.replaceAll(jokePlaceholder, () => {
-    return answers[i++] || '______'
-  })
-}
-
-const countJokes = (base: string) =>
-  (base.match(new RegExp(jokePlaceholder, 'g')) || []).length
+import { prepareJokeText } from '@/games/tonko/utils/prepareJokeText'
+import { countJokes } from '@/games/tonko/utils/countJokes'
 
 const JokeView = memo(
   ({
@@ -54,7 +42,7 @@ const JokeView = memo(
     const commitAnswerToList = useCallback(() => {
       if (inputRef.current) {
         const value = inputRef.current.value.slice(0, 40)
-        setAnswers(ans => [...ans, value || 'Error'])
+        setAnswers(ans => [...ans, value || ''])
         inputRef.current.value = ''
       }
     }, [inputRef])
@@ -67,42 +55,58 @@ const JokeView = memo(
       answerFn(answers)
     }, [answers])
 
+    const submitKey = useCallback(
+      e => {
+        if (e.key === 'Enter') {
+          commitAnswerToList()
+        }
+      },
+      [commitAnswerToList],
+    )
+
     return (
-      <div className='flex w-full flex-col items-center space-y-3 p-3'>
-        <span className='w-full text-center'>{preparedText}</span>
-        {!readyToSend && (
-          <Input
-            placeholder='Добивочка'
-            onChange={e => console.log(e.target.value)}
-            getRef={inputRef}
-            className='w-full'
-            maxLength={40}
-          />
-        )}
-        <div className='flex w-full items-center space-x-2'>
-          {answersCount ? (
-            <Button
-              icon={<ReplyIcon className='h-5 w-5 stroke-1 text-white' />}
+      <div className='flex h-full w-full flex-col'>
+        <div className='flex w-full grow flex-col items-center justify-center space-y-3 p-3'>
+          <p className='mb-4 w-full whitespace-pre-line text-center'>
+            {preparedText}
+          </p>
+          {!readyToSend && (
+            <Input
+              placeholder='Заполните пропуск'
+              getRef={inputRef}
               className='w-full'
-              variant='error'
-              square
-              onClick={dropLastAnswer}
-            />
-          ) : null}
-          {readyToSend ? (
-            <Button
-              label={'Отправить'}
-              className='w-full'
-              onClick={answerCallback}
-            />
-          ) : (
-            <Button
-              label={'Ответить'}
-              className='w-full'
-              onClick={commitAnswerToList}
+              maxLength={40}
+              onKeyDown={submitKey}
             />
           )}
+          <div className='flex w-full items-center space-x-2'>
+            {answersCount ? (
+              <Button
+                icon={<ReplyIcon className='h-5 w-5 stroke-1 text-white' />}
+                className='w-full'
+                variant='error'
+                square
+                onClick={dropLastAnswer}
+              />
+            ) : null}
+            {readyToSend ? (
+              <Button
+                label={'Отправить'}
+                className='w-full'
+                onClick={answerCallback}
+              />
+            ) : (
+              <Button
+                label={'Ответить'}
+                className='w-full'
+                onClick={commitAnswerToList}
+              />
+            )}
+          </div>
         </div>
+        <span className='w-full text-center text-xs text-zinc-500'>
+          Попробуйте написать вместо пропуска что-нибудь уморительное
+        </span>
       </div>
     )
   },

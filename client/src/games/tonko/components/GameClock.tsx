@@ -7,13 +7,9 @@ import { DateTime } from 'luxon'
 
 export const GameClock = withApp(({ app }) => {
   const [time, setTime] = useRecoilState(timeStore)
-  const [currentTime, setCurrentTime] = useState<number>(9)
+  const [currentTime, setCurrentTime] = useState<number>(0)
 
   useEffect(() => {
-    setTime({
-      timeStamp: DateTime.now().plus({ second: 21 }).toSeconds(),
-      left: 21,
-    })
     const offTimeListener = app.on<TonkoGameEvent>(
       '@game/timeLeft',
       ({ time }: { time: number }) => {

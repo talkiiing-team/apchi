@@ -31,13 +31,16 @@ export const registerGameController: Controller = (io: Server) => {
           )({ reason: 'No room found', code: 404 })
         }
 
-        const result = GeneralDaemon.get(roomId)?.applyAction(
-          user,
-          action,
-          ...args,
-        )
-
-        return emit(prefix('do.done'), sock)()
+        try {
+          const result = GeneralDaemon.get(roomId)?.applyAction(
+            user,
+            action,
+            ...args,
+          )
+          return emit(prefix('do.done'), sock)(result)
+        } catch (e) {
+          return emit(prefix('do.err'), sock)(e)
+        }
       },
     )
 

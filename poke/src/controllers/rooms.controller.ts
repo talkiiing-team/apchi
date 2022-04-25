@@ -83,9 +83,10 @@ export const registerRoomsController: Controller = (io: Server) => {
           sock,
         )({ reason: 'Forbidden', code: 403 })
 
-      const users = Array.from({ length: 7 }, () => fakeUser())
-        .map(user => userStore.insert(user.userId, user))
-        .filter(user => exists(user)) as User[]
+      const users = [] as User[]
+      // const users = Array.from({ length: 2 }, () => fakeUser())
+      //   .map(user => userStore.insert(user.userId, user))
+      //   .filter(user => exists(user)) as User[]
 
       const result = roomStore.create({
         ...item,

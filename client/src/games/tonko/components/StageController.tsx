@@ -9,10 +9,10 @@ import { GameClock } from '../components/GameClock'
 
 const gameStageDict: Record<Stage, string> = {
   off: 'Неактивно',
-  starting: 'Начинаем!',
+  starting: 'Приветствуем в Tonko!',
   punching: 'Вводите свои ответы',
   voting: 'Голосуйте!',
-  overviewing: 'Вот так вот',
+  overviewing: 'Результаты',
 }
 
 export const StageController = withApp(({ app }) => {
