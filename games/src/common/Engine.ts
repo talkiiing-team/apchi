@@ -135,8 +135,3 @@ export abstract class Engine<State extends object> {
     this.sendToUser = engineUtils.sendToUser
   }
 }
-
-//
-// GlobalDaemon.register() //...
-// new Instance(TonkoEngine) //... =>
-// instance.installGame(TonkoEngine)

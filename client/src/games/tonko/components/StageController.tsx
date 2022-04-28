@@ -3,9 +3,9 @@ import { useRecoilState } from 'recoil'
 import { gameStateStore, timeStore } from '../store/tonko.store'
 import { useCallback, useEffect, useMemo } from 'react'
 import { withApp } from '@/hoc/withApp'
-import { Stage, TonkoGameEvent } from '@apchi/games'
 import { TonkoClientState } from '@apchi/games/src/tonko/client'
 import { GameClock } from '../components/GameClock'
+import { Stage, TonkoGameEvent } from '@apchi/games/src/tonko'
 
 const gameStageDict: Record<Stage, string> = {
   off: 'Неактивно',

@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
-import { exists } from '@apchi/poke/src/utils/controllerUtils'
+
+export const exists = <T>(undefinable: T | undefined): undefinable is T =>
+  undefinable !== undefined
 
 export type AnyRecord = Record<string, unknown>
 
@@ -17,9 +19,6 @@ export type TableReducerFn<T, PK> = (item: T, id: PK) => boolean
 export type TableForEachReducerFn<T, PK> = (item: T, id: PK) => any
 
 export type CrudMethod = keyof Crud<any, any>
-
-// TODO: Убить долбаеба который пишет так
-//export crudMethods: string[] = ['get', 'find', 'findAll', 'findId', 'findAllIds', 'create' ]
 
 export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
   get(id: T[PK] | undefined): T | undefined
@@ -42,6 +41,9 @@ export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
   dump(): Table<T, PK>
   dumpToArray(length?: number): T[]
   forEach(fn: TableForEachReducerFn<T, number>): any
+  _merge<ExternalType = Record<string, any>>(
+    externalItems: (Record<PK, T[PK]> & ExternalType)[],
+  ): any[]
   _clean(): void
   length(): number
 }
@@ -190,6 +192,15 @@ export const useTable =
       },
       forEach(fn) {
         return this.dumpToArray().forEach(fn)
+      },
+      _merge<ExternalType = Record<string, any>>(
+        externalItems: (Record<PK, T[PK]> & ExternalType)[],
+      ) {
+        return externalItems.map(extElement =>
+          extElement[pk] !== undefined
+            ? { ...extElement, ...(this.get(extElement[pk]) || {}) }
+            : extElement,
+        )
       },
       _clean() {
         STORAGE[name] = {}

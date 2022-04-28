@@ -1,7 +1,12 @@
 import { useRecoilState } from 'recoil'
 import { gameStateStore } from '@/games/tonko/store/tonko.store'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Actions, Joke, JokeSubmissionData, TonkoGameEvent } from '@apchi/games'
+import {
+  Actions,
+  Joke,
+  JokeSubmissionData,
+  TonkoGameEvent,
+} from '@apchi/games/src/tonko'
 import { withApp } from '@/hoc/withApp'
 import { Room } from '@apchi/shared'
 import { prepareJokeText } from '@/games/tonko/utils/prepareJokeText'
@@ -12,10 +17,12 @@ const JokeView = memo(
     text,
     voteFn,
     answers,
+    canVote,
   }: {
     text: Joke['jokeDraft']
     voteFn: () => void
     answers: Joke['answers']
+    canVote?: boolean
   }) => {
     const resultAnswer = useMemo(() => {
       return answers?.map((v, i) => (
@@ -26,9 +33,11 @@ const JokeView = memo(
     }, [answers])
 
     return (
-      <div className='flex w-full flex-col space-y-2 bg-pink-100 p-2'>
-        <div className='mb-4 w-full'>{resultAnswer}</div>
-        <Button label={'Лайкусик'} className='w-full' onClick={voteFn} />
+      <div className='flex w-full flex-col space-y-6 rounded-2xl bg-white p-3 ring-1 ring-zinc-400'>
+        <div className='w-full'>{resultAnswer}</div>
+        {canVote ? (
+          <Button label={'Лайкусик'} className='w-full' onClick={voteFn} />
+        ) : null}
       </div>
     )
   },

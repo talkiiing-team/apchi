@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { JokeRatingGameData, TonkoGameEvent } from '@apchi/games'
+import { JokeRatingGameData, TonkoGameEvent } from '@apchi/games/src/tonko'
 import { withApp } from '@/hoc/withApp'
 import { Room, User } from '@apchi/shared'
 export type LeaderboardRecord = {
@@ -9,7 +9,7 @@ export type LeaderboardRecord = {
 
 export const Overviewing = withApp<{ roomId: Room['id'] }>(
   ({ app, roomId }) => {
-    const [leaderboard, setLeaderboard] = useState<any[]>([])
+    const [leaderboard, setLeaderboard] = useState<LeaderboardRecord[]>([])
 
     useEffect(() => {
       const offLeaderboard = app.on<TonkoGameEvent>(
@@ -30,7 +30,11 @@ export const Overviewing = withApp<{ roomId: Room['id'] }>(
           <span className='w-full text-center text-sm'>Leaderboard</span>
         </div>
         <div className='flex w-full flex-col space-y-2'>
-          {JSON.stringify(leaderboard)}
+          {leaderboard.map(v => (
+            <div key={v.user.name}>
+              {v.score} {v.user.name}
+            </div>
+          ))}
         </div>
       </div>
     )

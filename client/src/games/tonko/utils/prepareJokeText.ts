@@ -1,4 +1,4 @@
-import { Joke, jokePlaceholder } from '@apchi/games'
+import { Joke, jokePlaceholder } from '@apchi/games/src/tonko'
 
 export const prepareJokeText = (
   text: Joke['jokeDraft'],

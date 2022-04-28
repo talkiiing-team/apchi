@@ -2,7 +2,7 @@ import { withApp } from '@/hoc/withApp'
 import { useRecoilState } from 'recoil'
 import { timeStore } from '@/games/tonko/store/tonko.store'
 import { useEffect, useMemo, useState } from 'react'
-import { TonkoGameEvent } from '@apchi/games'
+import { TonkoGameEvent } from '@apchi/games/src/tonko'
 import { DateTime } from 'luxon'
 
 export const GameClock = withApp(({ app }) => {

@@ -2,6 +2,7 @@ export * from './models/User.model'
 export * from './models/Room.model'
 export * from './models/Credentials.model'
 export * from './models/Game.model'
+export * from './models/Requirements.model'
 export * from './base/useTable'
 export * from './base/useSleep'
 

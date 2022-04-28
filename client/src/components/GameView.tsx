@@ -5,7 +5,7 @@ import { CubeTransparentIcon } from '@heroicons/react/outline'
 
 const BaseNoGameFallback = () => {
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center space-y-2'>
+    <div className='flex h-full w-full grow flex-col items-center justify-center space-y-2'>
       <CubeTransparentIcon className='h-12 w-12 stroke-1 text-zinc-500' />
       <span className='font-fancy text-sm text-zinc-700'>
         Не удалось загрузить игру
@@ -22,9 +22,12 @@ export const GameView = memo(
           () =>
             new Promise(res => {
               import(`../games/${gameId}/index.ts`)
-                .catch(r => ({
-                  default: BaseNoGameFallback,
-                }))
+                .catch(e => {
+                  console.error(e)
+                  return {
+                    default: BaseNoGameFallback,
+                  }
+                })
                 .then(r => setTimeout(() => res(r), 200))
             }),
         )

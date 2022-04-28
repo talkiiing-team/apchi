@@ -1,7 +1,6 @@
 export * from './common/Engine'
 
 import { TonkoEngine as Tonko } from './tonko/server/Tonko.engine'
-export * from './tonko'
 
 export const games = [Tonko] as const
 
