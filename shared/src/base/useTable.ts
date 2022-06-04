@@ -16,7 +16,10 @@ export type Table<T extends AnyRecord, PK extends SafeKeyTypes<T>> = Record<
 >
 
 export type TableReducerFn<T, PK> = (item: T, id: PK) => boolean
-export type TableForEachReducerFn<T, PK> = (item: T, id: PK) => any
+export type TableForEachReducerFn<T, Index = number> = (
+  item: T,
+  id: Index,
+) => any
 
 export type CrudMethod = keyof Crud<any, any>
 

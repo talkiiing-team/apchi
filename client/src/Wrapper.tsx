@@ -5,11 +5,20 @@ import { useAuth } from '@/hooks/useAuth'
 import { loginStateStore } from '@/store/auth.store'
 import { LoginState } from '@/types'
 import { withApp } from '@/hoc/withApp'
+import bridge from '@vkontakte/vk-bridge'
 
 const Wrapper = withApp(({ app }) => {
   const { authenticated } = useAuth(true)
   const loginState = useRecoilValue(loginStateStore)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    bridge
+      .send('VKWebAppInit')
+      .then(r => console.log('start sent', r))
+      .catch(e => console.log('bridge cannot connect ', e))
+    bridge.subscribe(e => console.log('VKBridge: ', e))
+  }, [])
 
   useEffect(() => {
     console.log('auth', authenticated)
