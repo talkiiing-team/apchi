@@ -13,14 +13,6 @@ const Wrapper = withApp(({ app }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    bridge
-      .send('VKWebAppInit')
-      .then(r => console.log('start sent', r))
-      .catch(e => console.log('bridge cannot connect ', e))
-    bridge.subscribe(e => console.log('VKBridge: ', e))
-  }, [])
-
-  useEffect(() => {
     console.log('auth', authenticated)
     const globalUnSubscriber = () => {
       app

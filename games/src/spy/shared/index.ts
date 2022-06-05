@@ -10,6 +10,7 @@ export enum SpyGameEvent {
   VoteAccepted = 'voteAccepted',
   VoteDeclined = 'voteDeclined',
   Leaderboard = 'leaderboard',
+  UsersPresentation = 'usersPresentation',
 }
 
 export enum Stage {

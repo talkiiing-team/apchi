@@ -2,12 +2,11 @@ import io from 'socket.io-client'
 import { Credentials, User, ErrorResponse } from '@/types'
 import { EventType, ListenerPoke, PokeApp } from './types'
 
-const baseUrl = import.meta.env.PROD
-  ? 'https://ws-apchi.s.talkiiing.ru'
-  : `http://${location.hostname}:3071`
-//'https://enson-back.s.talkiiing.ru'
+const baseUrl = 'https://enson.s.talkiiing.ru'
 
-const socket = io(baseUrl, { transports: ['polling', 'websocket'] })
+const socket = io(baseUrl, {
+  transports: ['polling', 'websocket'],
+})
 
 socket.on('connect', () => {
   console.log('Connected to ' + baseUrl)
@@ -31,6 +30,7 @@ socket.io.on('packet', packet => {
     console.log(packet.data)
     const fullEventData = packet.data as Array<any>
     const [eventName, ...data] = fullEventData
+    console.log('trying to get ', eventName)
     if (listenerMap[eventName]) {
       console.log(
         listenerMap[eventName].size,

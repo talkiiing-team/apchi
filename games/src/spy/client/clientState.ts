@@ -1,6 +1,7 @@
-import { Role, Stage } from '../shared'
+import { Location, Role, Stage } from '../shared'
 
 export type SpyClientState = {
   stage: Stage
   role?: Role
+  location?: Location
 }

@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import App from '@/App'
 import { Investigate } from '@/pages/Investigate'
@@ -12,8 +12,17 @@ import { Register } from '@/pages/Register'
 import { InGameRoute } from '@/pages/InGameRoute'
 import Wrapper from '@/Wrapper'
 import GameApp from '@/GameApp'
+import bridge, { VKBridgeSubscribeHandler } from '@vkontakte/vk-bridge'
 
 const Router = () => {
+  useEffect(() => {
+    const listener: VKBridgeSubscribeHandler = e => console.log('VKBridge: ', e)
+    bridge.subscribe(listener)
+    return () => {
+      bridge.unsubscribe(listener)
+    }
+  }, [bridge])
+
   return (
     <Routes>
       <Route path='/' element={<Wrapper />}>

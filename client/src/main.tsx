@@ -7,6 +7,12 @@ import { AdaptivityProvider, AppRoot, ConfigProvider } from '@vkontakte/vkui'
 
 import './index.css'
 import '@vkontakte/vkui/dist/vkui.css'
+import bridge from '@vkontakte/vk-bridge'
+
+console.log('trying to subscribe VKBridge')
+bridge.send('VKWebAppInit')
+// .then(r => console.log('start sent', r))
+// .catch(e => console.log('bridge cannot connect ', e))
 
 function DebugObserver() {
   const snapshot = useRecoilSnapshot()
@@ -28,14 +34,14 @@ ReactDOM.render(
   <React.StrictMode>
     <ConfigProvider>
       <AdaptivityProvider>
-        <RecoilRoot>
-          <DebugObserver />
-          <AppRoot className='h-full'>
+        <AppRoot className='h-full'>
+          <RecoilRoot>
+            <DebugObserver />
             <BrowserRouter>
               <Router />
             </BrowserRouter>
-          </AppRoot>
-        </RecoilRoot>
+          </RecoilRoot>
+        </AppRoot>
       </AdaptivityProvider>
     </ConfigProvider>
   </React.StrictMode>,
