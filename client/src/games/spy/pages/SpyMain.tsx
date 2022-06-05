@@ -1,6 +1,6 @@
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { inGameStateStore } from '@/store/game.store'
-import { gameStateStore, userStore } from '../store/spy.store'
+import { gameStateStore, userStore as spyUserStore } from '../store/spy.store'
 import { useCallback, useEffect, useMemo } from 'react'
 import { withApp } from '@/hoc/withApp'
 import { Stage, SpyGameEvent, Role, Location } from '@apchi/games/src/spy'
@@ -9,13 +9,18 @@ import { Room, User } from '@apchi/shared'
 import { Starting } from './Starting'
 import { Giveaway } from '@/games/spy/pages/Giveaway'
 import { Vote } from '@/games/spy/pages/Vote'
+import { Results } from '@/games/spy/pages/Results'
+import { userStore } from '@/store/auth.store'
+import { GuessLocation } from '@/games/spy/pages/GuessLocation'
+import { Setup } from '@/games/spy/pages/Setup'
 
 const Awaiting = () => <div>Секунду, загрузка продолжается...</div>
 
 export const SpyMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
   const [gameState, setGameState] = useRecoilState(gameStateStore)
   const [inGameState, setInGameState] = useRecoilState(inGameStateStore)
-  const [usersMap, setUsersMap] = useRecoilState(userStore)
+  const [usersMap, setUsersMap] = useRecoilState(spyUserStore)
+  const user = useRecoilValue(userStore)
 
   const leaveGame = useCallback(() => {
     app
@@ -30,9 +35,22 @@ export const SpyMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
   useEffect(() => {
     const offReceiveCard = app.on<SpyGameEvent>(
       '@game/receiveCard',
-      ({ role, location }: { role: Role; location?: Location }) => {
-        console.log('new data', role, location)
-        setGameState(state => ({ ...state!, role: role, location: location }))
+      ({
+        role,
+        location,
+        locations,
+      }: {
+        role: Role
+        location?: Location
+        locations?: Location[]
+      }) => {
+        console.log('new data', role, location, locations)
+        setGameState(state => ({
+          ...state!,
+          role: role,
+          location: location,
+          locations: locations,
+        }))
       },
     )
     const offUsersPresentation = app.on<SpyGameEvent>(
@@ -74,15 +92,22 @@ export const SpyMain = withApp<{ roomId: Room['id'] }>(({ app, roomId }) => {
     if (gameState.stage === Stage.Starting) {
       return Starting
     }
+    if (gameState.stage === Stage.GameSetup) {
+      return Setup
+    }
     if (gameState.stage === Stage.Giveaway) {
       return Giveaway
     }
     if (gameState.stage === Stage.Vote) {
-      return Vote
+      if (gameState.role === Role.Normal) {
+        return Vote
+      } else {
+        return GuessLocation
+      }
     }
-    /* if (gameState.stage === Stage.Results) {
-      return Result
-    }*/
+    if (gameState.stage === Stage.Results) {
+      return Results
+    }
     return () => null
   }, [gameState?.stage])
 

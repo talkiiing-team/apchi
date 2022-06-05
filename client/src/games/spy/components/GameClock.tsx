@@ -1,16 +1,17 @@
 import { withApp } from '@/hoc/withApp'
 import { useRecoilState } from 'recoil'
-import { timeStore } from '@/games/tonko/store/tonko.store'
+import { timeStore } from '@/games/spy/store/spy.store'
 import { useEffect, useMemo, useState } from 'react'
-import { TonkoGameEvent } from '@apchi/games/src/tonko'
 import { DateTime } from 'luxon'
+import bridge from '@vkontakte/vk-bridge'
+import { SpyGameEvent } from '@apchi/games/src/spy'
 
 export const GameClock = withApp(({ app }) => {
   const [time, setTime] = useRecoilState(timeStore)
   const [currentTime, setCurrentTime] = useState<number>(0)
 
   useEffect(() => {
-    const offTimeListener = app.on<TonkoGameEvent>(
+    const offTimeListener = app.on<SpyGameEvent>(
       '@game/timeLeft',
       ({ time }: { time: number }) => {
         console.log('new time', time)
@@ -46,7 +47,13 @@ export const GameClock = withApp(({ app }) => {
     }
   }, [time?.timeStamp])
 
-  const timeIsUp = useMemo(() => currentTime < 15, [currentTime])
+  const timeIsUp = useMemo(() => {
+    if (currentTime < 15) {
+      bridge.send('VKWebAppFlashSetLevel', { level: 1 })
+      setTimeout(() => bridge.send('VKWebAppFlashSetLevel', { level: 0 }), 500)
+    }
+    return currentTime < 15
+  }, [currentTime])
 
   return (
     <span

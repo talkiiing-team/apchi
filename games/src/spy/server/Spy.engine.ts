@@ -45,7 +45,7 @@ export class SpyEngine extends Engine<SpyState> {
   static meta: Game = {
     id: 'spy',
     name: 'Spy',
-    description: 'Находка для шпиона, только онлайн!',
+    description: 'Находка для шпиона, только онлайн! (рек. 3-8 игроков)',
     requirements: {
       maxUsers: 8,
       minUsers: 3,
@@ -68,11 +68,17 @@ export class SpyEngine extends Engine<SpyState> {
     this.sendToRoom(buildGameEvent(SpyGameEvent.StageChange), {
       stage: Stage.Launch,
     })
+    this.locations = this.starterLocations.map(locname => ({
+      name: locname,
+      id: uuidv4(),
+    }))
 
     setTimeout(() => {
       this.state.stage = Stage.GameSetup
     }, 2000)
   }
+
+  private win: undefined | Role
 
   private registerUsers() {
     this.users.forEach(user => {
@@ -118,7 +124,7 @@ export class SpyEngine extends Engine<SpyState> {
           this.sendToRoom(buildGameEvent(SpyGameEvent.StageChange), {
             stage: Stage.Starting,
           })
-          this.currentLocation = selectRandom(this.starterLocations)
+          this.currentLocation = selectRandom(this.locations)
           this.sendToRoom(buildGameEvent(SpyGameEvent.TimeLeft), {
             time: 5,
           })
@@ -139,6 +145,9 @@ export class SpyEngine extends Engine<SpyState> {
           this.state.userGameStore!.forEach((user, i) => {
             log('currently on player', i)
             this.state.userGameStore.patch(user.userId, { role: this.roles[i] })
+            this.normalUsers = this.state.userGameStore.findAllIds(
+              user => user.role === Role.Normal,
+            )
             this.sendToUser(
               user.userId,
               buildGameEvent(SpyGameEvent.ReceiveCard),
@@ -149,6 +158,8 @@ export class SpyEngine extends Engine<SpyState> {
                   this.roles[i] === Role.Normal
                     ? this.currentLocation
                     : undefined,
+                locations:
+                  this.roles[i] === Role.Spy ? this.locations : undefined,
               },
             )
           })
@@ -181,6 +192,17 @@ export class SpyEngine extends Engine<SpyState> {
           break
         }
         case Stage.Results: {
+          this.sendToRoom(buildGameEvent(SpyGameEvent.Results), {
+            spyList: this.users.filter(u =>
+              this.state.userGameStore
+                .findAll(user => user.role === Role.Spy)
+                .map(user => user.userId)
+                .includes(u.userId),
+            ),
+            won: this.win!,
+          })
+
+          this.finishGame()
           break
         }
       }
@@ -195,13 +217,32 @@ export class SpyEngine extends Engine<SpyState> {
     log(`Got action === ${action}`)
     if (action === Actions.Vote) {
       if (this.state.stage !== Stage.Vote)
-        throw { reason: 'Right now is not a setup stage', code: 403 }
+        throw { reason: 'Right now is not a vote stage', code: 403 }
       const suspect = this.users.find(u => u.userId === args[0])!
       this.sendToRoom(buildGameEvent(SpyGameEvent.VoteAccepted), {
         suspect: suspect,
         issuer: user,
       })
       this.suspects = { ...this.suspects, [user.userId]: suspect.userId }
+      if (Object.keys(this.suspects).length === this.normalUsers.length) {
+        const sus = Object.values(this.suspects)
+        const fSus = sus[0]
+        if (sus.every(v => v === fSus)) {
+          // win
+        } else {
+          // lose
+        }
+        this.win = Role.Normal
+        this.endDiscussion?.()
+      }
+    } else if (action === Actions.GuessLocation) {
+      if (this.state.stage !== Stage.Vote)
+        throw { reason: 'Right now is not a vote stage', code: 403 }
+      const locationId = args[0] as Location['id']
+      if (locationId === this.currentLocation.id) {
+        this.win = Role.Spy
+        this.endDiscussion?.()
+      }
     }
   }
 

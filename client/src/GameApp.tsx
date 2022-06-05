@@ -41,7 +41,10 @@ const GameApp = withApp(({ app }) => {
 
   const leaveGameButton = useMemo(
     () => (
-      <div className='flex items-center space-x-1' onClick={leaveGame}>
+      <div
+        className='mr-4 flex cursor-pointer items-center space-x-1'
+        onClick={leaveGame}
+      >
         <ChevronLeftIcon className='h-6 w-6 text-current' />
         <span>Выйти</span>
       </div>

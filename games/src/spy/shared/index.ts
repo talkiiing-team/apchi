@@ -9,7 +9,7 @@ export enum SpyGameEvent {
   StageChange = 'stageChange',
   VoteAccepted = 'voteAccepted',
   VoteDeclined = 'voteDeclined',
-  Leaderboard = 'leaderboard',
+  Results = 'results',
   UsersPresentation = 'usersPresentation',
 }
 
@@ -35,6 +35,7 @@ export type UserGameData = {
 
 export enum Actions {
   Vote = 'vote',
+  GuessLocation = 'guessLocation',
   StartGame = 'startGame',
 }
 
