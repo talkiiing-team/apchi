@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io'
 
 export const emit =
-  (eventName: string, sock: Socket) =>
+  (eventName: string, sock: Socket, hash: string) =>
   (...obj: any) =>
-    sock.emit(eventName, ...obj)
+    sock.emit(eventName, hash, ...obj)

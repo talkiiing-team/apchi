@@ -1,4 +1,4 @@
-import { CrudStorage, getBoundStorage } from '@apchi/shared'
+import { CrudStorage, getBoundStorage } from '@/base/useTable'
 
 const Storage: CrudStorage = {}
 

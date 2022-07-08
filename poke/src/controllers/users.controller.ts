@@ -2,13 +2,15 @@ import { exposeCrud } from '@/common/exposeCrud'
 import { userStore } from '@/store/user.store'
 import { Server, Socket } from 'socket.io'
 import { Controller } from '@/types'
-import { fakeUser } from '@/dataUtils/fakeUser'
+import { createController } from '@/common/createController'
 
-const basePrefix = 'users'
-
-export const registerUsersController: Controller =
-  (io: Server) => (sock: Socket, listeners) => {
+export const registerUsersController: Controller = createController({
+  scope: 'users',
+  requireAuth: true,
+  register: (addListener, { socket, io, context }) => {
     exposeCrud(userStore, ['get', 'patch', 'update', 'dump', 'dumpToArray'])(
-      basePrefix,
-    )(io)(sock, listeners)
-  }
+      addListener,
+      { socket, io, context },
+    )
+  },
+})

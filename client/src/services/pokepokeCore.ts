@@ -1,8 +1,9 @@
 import io from 'socket.io-client'
 import { Credentials, User, ErrorResponse } from '@/types'
 import { EventType, ListenerPoke, PokeApp } from './types'
+import { nanoid } from 'nanoid'
 
-const baseUrl = 'https://enson.s.talkiiing.ru'
+const baseUrl = 'http://localhost:3071'
 
 const socket = io(baseUrl, {
   transports: ['polling', 'websocket'],
@@ -67,24 +68,33 @@ export const pokepokeCore: PokeApp & Record<any, any> = {
         const event = buildEvent(service, method)
         console.log('call')
         return new Promise((res, rej) => {
-          socket.emit(event, ...args)
-          console.log('socket sent')
+          const resolvedEvent = `${event}.resolved`
+          const rejectedEvent = `${event}.rejected`
 
-          const doneEvent = `${event}.done`
-          const errEvent = `${event}.err`
-          const doneListener = (result: any): void => {
+          const eventHash = nanoid(20)
+
+          const doneListener = (hash: string, result: any): void => {
+            console.log('done', result)
+            if (hash !== eventHash) return
+            console.log('approved')
             res(result)
-            socket.off(doneEvent, doneListener)
-            socket.off(errEvent, errListener)
+            socket.off(resolvedEvent, doneListener)
+            socket.off(rejectedEvent, errListener)
           }
-          const errListener = (error: ErrorResponse): void => {
+          const errListener = (hash: string, error: ErrorResponse): void => {
+            console.log('done', error)
+            if (hash !== eventHash) return
+            console.log('approved')
             rej({ ...error, error: true })
-            socket.off(errEvent, errListener)
-            socket.off(doneEvent, doneListener)
+            socket.off(rejectedEvent, errListener)
+            socket.off(resolvedEvent, doneListener)
           }
 
-          socket.on(doneEvent, doneListener)
-          socket.on(errEvent, errListener)
+          socket.on(resolvedEvent, doneListener)
+          socket.on(rejectedEvent, errListener)
+
+          socket.emit(event, eventHash, ...args)
+          console.log('socket event sent')
         })
       },
       insert(id, fullBody) {

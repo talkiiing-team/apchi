@@ -1,15 +1,53 @@
-import type { Server } from 'socket.io'
+import { Server } from 'socket.io'
 import { Socket } from 'socket.io'
+import { User } from '@/models/User.model'
 
 export type EventName = string
 
-export type ListenerFunction = (...args: any) => void
+export type RequestHash = string
 
-export type ListenerMap = Map<EventName, ListenerFunction>
+export type ListenerFunction = (
+  resolve: (...result: any[]) => void,
+  reject: (...reason: any[]) => void,
+) => (...args: any[]) => void
 
-/**
- * Listeners field - listeners to register
- */
-export type Controller = (
-  io: Server,
-) => (socket: Socket, listeners: ListenerMap) => void
+export type EventDrivenListenerFunction = (
+  hash: string,
+  ...args: any[]
+) => ReturnType<ReturnType<ListenerFunction>>
+
+export type ListenerMap = Map<EventName, EventDrivenListenerFunction>
+
+export type AddListenerFunction = (
+  eventName: string,
+  handler: ListenerFunction,
+) => void
+
+export type ExposeCrudFunction = []
+
+export type ControllerContext<T extends Record<string, any> = {}> = {
+  user?: User
+} & T
+
+export type ControllerRegisterer = (
+  addListener: AddListenerFunction,
+  {
+    socket,
+    io,
+    exposeCrud,
+    context,
+  }: {
+    socket: Socket
+    io: Server
+    exposeCrud?: ExposeCrudFunction
+    context: ControllerContext
+  },
+) => InvalidationFunction | void
+
+export type Controller = {
+  scope: string
+  requireAuth?: boolean
+  register: (io: Server) => ControllerRegisterer
+}
+
+export type InvalidationFunction = () => void
