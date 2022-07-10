@@ -11,8 +11,6 @@ import bridge from '@vkontakte/vk-bridge'
 
 console.log('trying to subscribe VKBridge')
 bridge.send('VKWebAppInit')
-// .then(r => console.log('start sent', r))
-// .catch(e => console.log('bridge cannot connect ', e))
 
 function DebugObserver() {
   const snapshot = useRecoilSnapshot()

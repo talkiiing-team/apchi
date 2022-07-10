@@ -3,7 +3,7 @@ import { Credentials, User, ErrorResponse } from '@/types'
 import { EventType, ListenerPoke, PokeApp } from './types'
 import { nanoid } from 'nanoid'
 
-const baseUrl = 'http://localhost:3071'
+const baseUrl = 'http://172.25.160.25:3071'
 
 const socket = io(baseUrl, {
   transports: ['polling', 'websocket'],
@@ -125,5 +125,13 @@ export const pokepokeCore: PokeApp & Record<any, any> = {
         return this.call('dumpToArray')
       },
     }
+  },
+}
+
+export const avocado = {
+  pictureUpload: baseUrl + '/api/picture',
+  drawingUpload: baseUrl + '/api/drawing',
+  getSource(id: number) {
+    return `${baseUrl}/api/picture/${id}`
   },
 }

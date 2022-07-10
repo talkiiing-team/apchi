@@ -1,12 +1,13 @@
 import * as path from 'path'
 import viteTsconfigPaths from 'vite-tsconfig-paths'
+import mkcert from 'vite-plugin-mkcert'
 
 import { defineConfig } from 'vite'
 
 import pkg from './package.json'
 
 export default defineConfig({
-  plugins: [viteTsconfigPaths()],
+  plugins: [viteTsconfigPaths(), mkcert()],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
@@ -18,6 +19,9 @@ export default defineConfig({
     rollupOptions: {
       external: [...Object.keys(pkg.dependencies), 'http'],
     },
+  },
+  server: {
+    https: true,
   },
   test: {},
 })

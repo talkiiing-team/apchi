@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Navbar } from '@/ui/Navbar'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { ReactComponent as Logo } from '@/assets/logo.svg'
@@ -18,6 +18,8 @@ import { loginStateStore } from '@/store/auth.store'
 import { LoginState } from '@/types'
 import { withApp } from '@/hoc/withApp'
 import { NotifyRoot } from '@/components/NotifyRoot'
+import { paramsStore } from '@/store/params.store'
+import { extractInitParams } from '@/utils/extractInitParams'
 
 const App = withApp(({ app }) => {
   const location = useLocation()
@@ -34,13 +36,13 @@ const App = withApp(({ app }) => {
           <View activePanel='main' className='h-full'>
             <Panel id='main' className='h-full'>
               <PanelHeader>
-                <Logo className='h-8 translate-y-0.5 text-violet-500' />
+                <span className='h-8 text-violet-500'>Signify</span>
               </PanelHeader>
               <div className='flex h-full w-full flex-grow flex-col items-center overflow-x-hidden overflow-y-hidden pb-[4rem]'>
                 <div className='flex h-full w-full max-w-lg grow flex-col space-y-2 p-3'>
                   <Outlet />
                 </div>
-                <Navbar />
+                {/*<Navbar />*/}
               </div>
             </Panel>
           </View>
