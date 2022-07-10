@@ -92,7 +92,11 @@ export const SignatureForm = withApp<{
               data: { url: avocado.getSource(res.data.id) },
             },
           } as Omit<WallPost, 'id'>)
-          .then(r => refetchPosts())
+          .then(r =>
+            refetchPosts().then(() => {
+              setType(null)
+            }),
+          )
       }
     }
   }
@@ -115,7 +119,11 @@ export const SignatureForm = withApp<{
             data: { url: avocado.getSource(res.data.id) },
           },
         } as Omit<WallPost, 'id'>)
-        .then(r => refetchPosts())
+        .then(r =>
+          refetchPosts().then(() => {
+            setType(null)
+          }),
+        )
     }
   }
 

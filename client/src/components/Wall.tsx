@@ -46,6 +46,8 @@ export const Wall = withApp<{ fetchPosts: () => Promise<void> }>(
     const [selectedId, setSelectedId] = useState<number | null>(null)
     const [signature, setSignature] = useState<WallPost | null>()
 
+    const isOwner = params.vk_profile_id === params.vk_user_id
+
     useEffect(() => {
       setLoading(true)
       fetchPosts().then(() => {
@@ -106,6 +108,7 @@ export const Wall = withApp<{ fetchPosts: () => Promise<void> }>(
                 </Button>
                 <Button
                   mode='secondary'
+                  disabled={!isOwner}
                   size='s'
                   onClick={() => {
                     bridge.send('VKWebAppShowStoryBox', {

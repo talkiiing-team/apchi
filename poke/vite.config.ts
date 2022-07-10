@@ -17,7 +17,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, './dist'),
     emptyOutDir: true,
     rollupOptions: {
-      external: [...Object.keys(pkg.dependencies), 'http'],
+      external: [...Object.keys(pkg.dependencies), 'http', 'nanoid'],
     },
   },
   server: {

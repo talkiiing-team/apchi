@@ -3,7 +3,7 @@ import { Credentials, User, ErrorResponse } from '@/types'
 import { EventType, ListenerPoke, PokeApp } from './types'
 import { nanoid } from 'nanoid'
 
-const baseUrl = 'http://172.25.160.25:3071'
+const baseUrl = 'https://signify.s.ix3.space'
 
 const socket = io(baseUrl, {
   transports: ['polling', 'websocket'],

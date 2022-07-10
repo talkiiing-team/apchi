@@ -61,15 +61,20 @@ export const Investigate = withApp(({ app }) => {
         </Section>
       ) : null}
       <ProfileWidget />
-      <span>{params.vk_profile_button_forbidden || 'mhmh'}</span>
-      <SlideButton
-        label={!isOwner ? 'Оставить подпись' : 'Расписать себе стену'}
-        icon={<PencilIcon className='h-5 w-5 text-white' />}
-        subLabel='Тык!'
-        subIcon={<CursorClickIcon className='h-5 w-5 text-white' />}
-        className='w-full'
-        onClick={() => setShowSelect(true)}
-      />
+      {!params.vk_profile_button_forbidden ? (
+        <SlideButton
+          label={!isOwner ? 'Оставить подпись' : 'Расписать себе стену'}
+          icon={<PencilIcon className='h-5 w-5 text-white' />}
+          subLabel='Тык!'
+          subIcon={<CursorClickIcon className='h-5 w-5 text-white' />}
+          className='w-full'
+          onClick={() => setShowSelect(true)}
+        />
+      ) : (
+        <span className='my-3 text-rose-500'>
+          Вам не разрешено оставлять подписи здесь
+        </span>
+      )}
       <Wall fetchPosts={refetchPosts} />
       {showSelect ? (
         <ActionSheet
