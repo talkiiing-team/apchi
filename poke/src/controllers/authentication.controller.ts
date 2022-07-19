@@ -2,17 +2,18 @@ import { userStore } from '@/store/user.store'
 import { authenticationStore } from '@/store/authentication.store'
 import { User, Credentials } from '@apchi/shared'
 import socketAuthStore from '@/store/socketAuth.store'
-import { Controller } from '@/types'
+import { Controller, PokeAction } from '@/types'
 import { buildLobbyName } from '@/utils/buildLobbyName'
 import { createController } from '@/common/createController'
 
 export const registerAuthenticateController: Controller = createController({
   scope: 'authentication',
+  transport: ['ws', 'rest'],
   requireAuth: false,
-  register: (addListener, { socket, io, exposeCrud, context }) => {
+  register: (addListener, { socket, exposeCrud }) => {
     addListener(
       'auth',
-      (resolve, reject) =>
+      (resolve, reject, context) =>
         ({ userId, password }: { userId: number; password?: string }) => {
           if (!Number.isInteger(userId)) return
           const auth = authenticationStore.get(userId)
@@ -30,7 +31,7 @@ export const registerAuthenticateController: Controller = createController({
 
     addListener(
       'register',
-      (resolve, reject) =>
+      (resolve, reject, context) =>
         ({
           userId,
           password,

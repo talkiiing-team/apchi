@@ -7,10 +7,11 @@ import { createController } from '@/common/createController'
 export const registerUsersController: Controller = createController({
   scope: 'users',
   requireAuth: true,
-  register: (addListener, { socket, io, context }) => {
+  transport: ['ws', 'rest'],
+  register: (addListener, { socket, context }) => {
     exposeCrud(userStore, ['get', 'patch', 'update', 'dump', 'dumpToArray'])(
       addListener,
-      { socket, io, context },
+      { socket, context },
     )
   },
 })

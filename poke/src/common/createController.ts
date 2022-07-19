@@ -2,13 +2,15 @@ import { Controller, ControllerRegisterer } from '@/types'
 import { Server } from 'socket.io'
 
 export const createController = (controller: {
-  register: ControllerRegisterer
   scope: Controller['scope']
+  transport: Controller['transport']
   requireAuth?: Controller['requireAuth']
+  register: ControllerRegisterer
 }): Controller => {
   return {
     scope: controller.scope,
+    transport: controller.transport,
     requireAuth: controller.requireAuth,
-    register: (io: Server) => controller.register,
+    register: controller.register,
   }
 }

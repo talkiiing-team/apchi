@@ -1,13 +1,13 @@
 import * as path from 'path'
 import viteTsconfigPaths from 'vite-tsconfig-paths'
-import mkcert from 'vite-plugin-mkcert'
+import mkCert from 'vite-plugin-mkcert'
 
 import { defineConfig } from 'vite'
 
 import pkg from './package.json'
 
 export default defineConfig({
-  plugins: [viteTsconfigPaths(), mkcert()],
+  plugins: [viteTsconfigPaths(), mkCert()],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),

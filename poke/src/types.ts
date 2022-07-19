@@ -1,53 +1,78 @@
 import { Server } from 'socket.io'
 import { Socket } from 'socket.io'
 import { User } from '@/models/User.model'
+import { Response, Router } from 'express'
 
 export type EventName = string
 
 export type RequestHash = string
 
-export type ListenerFunction = (
+export type ListenerFunction<Props = any> = (
   resolve: (...result: any[]) => void,
   reject: (...reason: any[]) => void,
-) => (...args: any[]) => void
+  context: ControllerContext,
+) => (...payload: Props[]) => void
 
 export type EventDrivenListenerFunction = (
+  context: ControllerContext,
+) => (
   hash: string,
-  ...args: any[]
+  ...payload: any[]
 ) => ReturnType<ReturnType<ListenerFunction>>
 
-export type ListenerMap = Map<EventName, EventDrivenListenerFunction>
+export type RestResponse = Response<any, Record<string, any>>
 
-export type AddListenerFunction = (
+export type RestDrivenListenerFunction = (
+  context: ControllerContext,
+) => (
+  res: RestResponse,
+  ...payload: any[]
+) => ReturnType<ReturnType<ListenerFunction>>
+
+export type EventListenerMap = Map<EventName, EventDrivenListenerFunction>
+
+export type RestListenerMap = Map<EventName, RestDrivenListenerFunction>
+
+export type EventControllerRegistrar = (
+  io: Server,
+) => (socket: Socket) => (controllers: Controller[]) => Promise<void>
+
+export type RestControllerRegistrar = (
+  router: Router,
+) => (controllers: Controller[]) => Promise<void>
+
+export type AddListenerFunction = <Props = any>(
   eventName: string,
-  handler: ListenerFunction,
+  handler: ListenerFunction<Props>,
+  specificTransport?: PokeTransports[],
 ) => void
 
 export type ExposeCrudFunction = []
 
 export type ControllerContext<T extends Record<string, any> = {}> = {
-  user?: User
+  user: User | undefined
+  getUser?: () => User | undefined
+  event: string
 } & T
 
 export type ControllerRegisterer = (
   addListener: AddListenerFunction,
   {
     socket,
-    io,
     exposeCrud,
-    context,
   }: {
     socket: Socket
-    io: Server
     exposeCrud?: ExposeCrudFunction
-    context: ControllerContext
   },
 ) => InvalidationFunction | void
 
+export type PokeTransports = 'ws' | 'rest'
+
 export type Controller = {
   scope: string
+  transport: PokeTransports[]
   requireAuth?: boolean
-  register: (io: Server) => ControllerRegisterer
+  register: ControllerRegisterer
 }
 
 export type InvalidationFunction = () => void

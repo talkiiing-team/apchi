@@ -6,18 +6,34 @@ import { WallPost } from '@/models/Wall.model'
 export const registerWallController: Controller = createController({
   scope: 'wall',
   requireAuth: false,
-  register: (addListener, { socket: sock, io, exposeCrud, context }) => {
-    addListener('createPost', (resolve, reject) => (item: WallPost) => {
-      const result = wallStore.create(item)
-      resolve(result)
-    })
+  transport: ['ws'],
+  register: (addListener, { socket: sock, exposeCrud }) => {
+    addListener<WallPost>(
+      'createPost',
+      (resolve, reject, context) => item => {
+        const result = wallStore.create(item)
+        resolve(result)
+      },
+      ['rest'],
+    )
 
-    addListener('list', (resolve, reject) => (target: number) => {
+    addListener('list', (resolve, reject, context) => (target: number) => {
       resolve(wallStore.findAll(post => post.target === target))
     })
 
-    addListener('get', (resolve, reject) => (target: number) => {
-      resolve(wallStore.get(target))
+    addListener(
+      'get',
+      (resolve, reject, context) =>
+        ({ target }: { target: number }) => {
+          // @ts-ignore
+          const newid = wallStore.create({ suck: 'cock' }).id
+          console.log(typeof target)
+          resolve({ content: wallStore.get(target), newId: newid })
+        },
+    )
+
+    addListener('test', (resolve, reject, context) => () => {
+      resolve(wallStore.dumpToArray(5))
     })
   },
 })

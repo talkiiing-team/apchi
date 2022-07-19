@@ -1,9 +1,5 @@
-import { Server } from 'socket.io'
-import { registerControllers } from '@/common/registerControllers'
 import { registerWallController } from '@/controllers/wall.controller'
+import { createControllerRegistrar } from '@/common/createControllerRegistrators'
 
-export const registerListeners = (io: Server) => {
-  io.on('connection', sock => {
-    registerControllers(io)(sock)([registerWallController])
-  })
-}
+export const { registerAllEventControllers, registerAllRestControllers } =
+  createControllerRegistrar([registerWallController])

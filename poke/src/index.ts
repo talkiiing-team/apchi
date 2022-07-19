@@ -1,13 +1,25 @@
-import { createSocketIO } from './socket'
+import { patchServerWithIO } from './socket'
 import { createServer } from 'http'
 import { app } from '@/rest'
+import {
+  registerAllRestControllers,
+  registerAllEventControllers,
+} from '@/listeners'
+import { Router } from 'express'
 
 const PORT = parseInt(import.meta.env.PORT || '3071')
+const httpBaseServer = createServer(app)
 
-const httpServer = createServer(app)
+const ioServer = patchServerWithIO(httpBaseServer)
+const router = Router()
 
-createSocketIO(httpServer)
+registerAllEventControllers(ioServer)
+registerAllRestControllers(router)
 
-const listener = httpServer.listen(PORT, '0.0.0.0', () => {
+app.use('/api', router)
+console.log(router.stack)
+app.get('/wall/ge', (req, res) => res.send('nok'))
+
+const listener = httpBaseServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Listening on //0.0.0.0:${(listener.address() as any).port}`)
 })
