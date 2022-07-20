@@ -1,7 +1,7 @@
-export const useSleep = () => {
+export const createSleepService = () => {
   let undoSleep: CallableFunction = () => {}
   const sleep = (ms: number) =>
-    new Promise((res, rej) => {
+    new Promise(res => {
       undoSleep = () => res(undefined)
       setTimeout(undoSleep, ms)
     })

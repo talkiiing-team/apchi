@@ -1,5 +1,6 @@
-import { roomPrimaryKey, Room, PrimaryKeyFillStrategy } from '@apchi/shared'
+import { roomPrimaryKey, Room } from '@apchi/shared'
 import { useTable } from '@/store/store'
+import { PrimaryKeyFillStrategy } from '@/base/types'
 
 export const roomStore = useTable<Room, typeof roomPrimaryKey>(
   'rooms',

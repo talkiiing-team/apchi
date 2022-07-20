@@ -1,11 +1,9 @@
 import { Server } from 'socket.io'
 import { Socket } from 'socket.io'
-import { User } from '@/models/User.model'
 import { Response, Router } from 'express'
+import { User } from '@/models/User.model'
 
 export type EventName = string
-
-export type RequestHash = string
 
 export type ListenerFunction<Props = any> = (
   resolve: (...result: any[]) => void,
@@ -35,7 +33,9 @@ export type RestListenerMap = Map<EventName, RestDrivenListenerFunction>
 
 export type EventControllerRegistrar = (
   io: Server,
-) => (socket: Socket) => (controllers: Controller[]) => Promise<void>
+  socket: Socket,
+  user?: User,
+) => (controllers: Controller[]) => Promise<void>
 
 export type RestControllerRegistrar = (
   router: Router,
@@ -51,7 +51,6 @@ export type ExposeCrudFunction = []
 
 export type ControllerContext<T extends Record<string, any> = {}> = {
   user: User | undefined
-  getUser?: () => User | undefined
   event: string
 } & T
 

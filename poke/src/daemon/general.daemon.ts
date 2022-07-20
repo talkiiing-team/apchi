@@ -1,7 +1,7 @@
 import { Room, Game, Crud, User } from '@apchi/shared'
 import { Engine, EngineUtils, gamesMap } from '@apchi/games'
 import { Server } from 'socket.io'
-import { buildRoomName } from '@/utils/buildRoomName'
+import { buildRoomName } from '@/utils/domain/buildRoomName'
 import { SocketAuth } from '@/models/SocketAuth.model'
 
 export const sendToRoom =

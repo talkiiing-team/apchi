@@ -80,7 +80,7 @@ export const registerRestControllers: RestControllerRegistrar =
       })
     })
 
-    console.log('Rest Listeners', restListenerMap)
+    console.log('Rest API', restListenerMap)
 
     /**
      * START Rest Registration Section
@@ -89,7 +89,7 @@ export const registerRestControllers: RestControllerRegistrar =
     restListenerMap.forEach((listenerFn, eventName) => {
       router.post(`/${eventName}`, (req, res) => {
         return listenerFn({
-          user: { userId: 0, name: 'test' },
+          user: res.locals.user,
           event: eventName,
         })(res, req.body)
       })

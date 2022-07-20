@@ -9,11 +9,10 @@ import {
   EventControllerRegistrar,
 } from '@/types'
 import { Server, Socket } from 'socket.io'
-import { tryUserAuthorization } from '@/common/authorizeUser'
-import { emit } from '@/utils/emit'
+import { emit } from '@/utils/transport/emit'
 
 export const registerEventControllers: EventControllerRegistrar =
-  (io: Server) => (socket: Socket) => async (controllers: Controller[]) => {
+  (io: Server, socket: Socket, user) => async (controllers: Controller[]) => {
     const eventListenerMap: EventListenerMap = new Map()
 
     const createSocketResolve =
@@ -93,13 +92,14 @@ export const registerEventControllers: EventControllerRegistrar =
      * START Socket Registration Section
      */
 
-    const context: Omit<ControllerContext, 'event'> = {
-      user: tryUserAuthorization(socket),
-      getUser: () => tryUserAuthorization(socket),
-    }
+    const context: Partial<Omit<ControllerContext, 'event'>> = {}
 
     eventListenerMap.forEach((listenerFn, eventName) => {
-      socket.on(eventName, listenerFn({ ...context, event: eventName }))
+      socket.on(
+        eventName,
+        // @ts-ignore
+        listenerFn({ ...context, user: user, event: eventName }),
+      )
     })
 
     socket.onAny((...args) => console.log(socket.id, socket.rooms, args))

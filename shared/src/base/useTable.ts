@@ -53,7 +53,7 @@ export type Crud<T extends AnyRecord, PK extends SafeKeyTypes<T>> = {
 
 export enum PrimaryKeyFillStrategy {
   AutoIncrement = 'autoincrement',
-  UUID = 'uuid',
+  Hash = 'hash',
 }
 
 type TableControllerOptions = {

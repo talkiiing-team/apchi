@@ -22,5 +22,10 @@
       "path": "../games/tsconfig.json"
     }
   ],
-  "include": ["src/**/*.ts", "vite.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json",
+    "vite.config.ts",
+    "./package.json"
+  ]
 }

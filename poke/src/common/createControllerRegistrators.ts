@@ -3,6 +3,8 @@ import { Server } from 'socket.io'
 import { registerEventControllers } from '@/common/registerEventControllers'
 import { Router } from 'express'
 import { registerRestControllers } from '@/common/registerRestControllers'
+import { authenticationSocketMiddleware } from '@/utils/authenticationMiddleware'
+import { User } from '@/models/User.model'
 
 export const createControllerRegistrar = (
   controllers: Controller[],
@@ -12,8 +14,16 @@ export const createControllerRegistrar = (
 } => {
   const registerAllEventControllers = (io: Server) => {
     // auto registration socket routes for each client
-    io.on('connection', sock => {
-      registerEventControllers(io)(sock)(controllers)
+    io.on('connection', socket => {
+      authenticationSocketMiddleware(
+        socket.client.request.headers.authorization,
+      ).then(user =>
+        registerEventControllers(
+          io,
+          socket,
+          user as User | undefined,
+        )(controllers),
+      )
     })
   }
 

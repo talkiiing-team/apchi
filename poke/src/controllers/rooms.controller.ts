@@ -1,19 +1,17 @@
 import { roomStore } from '@/store/room.store'
-import { emit } from '@/utils/emit'
-import { getContextUser, getContextUserId } from '@/utils/getContext'
-import { buildRoomName } from '@/utils/buildRoomName'
+import { buildRoomName } from '@/utils/domain/buildRoomName'
 import { Controller } from '@/types'
 import { exists } from '@/utils/controllerUtils'
-import { buildBroadcastEventName } from '@/utils/buildBroadcastEventName'
+import { buildBroadcastEventName } from '@/utils/domain/buildBroadcastEventName'
 import { RoomSection } from '@apchi/shared/src/enums/room.section'
 import {
   populateRoom,
   populateUser,
   roomMembersPopulate,
-} from '@/common/roomMembersPopulate'
+} from '@/utils/domain/roomMembersPopulate'
 import { Crud, DetailedRoom, Room, Section, User } from '@apchi/shared'
-import { createRoomHash } from '@/utils/createRoomHash'
-import { buildLobbyName } from '@/utils/buildLobbyName'
+import { createRoomHash } from '@/utils/domain/createRoomHash'
+import { buildLobbyName } from '@/utils/domain/buildLobbyName'
 import { Game } from '@apchi/shared/src/models/Game.model'
 import {
   GeneralDaemon,

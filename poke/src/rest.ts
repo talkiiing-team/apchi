@@ -2,6 +2,7 @@ import express, { Router } from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import filesStore from '@/store/files.store'
+import { ErrorRequestHandler } from 'express-serve-static-core'
 
 const app = express()
 
@@ -12,6 +13,24 @@ app.use(
 )
 
 app.use(express.json())
+
+/**
+ * Express has a problem with untyped interface for errors
+ */
+
+app.use(((err, req, res, next) => {
+  // @ts-ignore
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error(err)
+    return res.status(400).send({
+      status: 'rejected',
+      reason: 'JSON_PARSE_ERROR',
+      // @ts-ignore
+      message: err.message,
+    }) // Bad request
+  }
+  next()
+}) as express.ErrorRequestHandler)
 
 app.get('/', (req, res) => res.json({ greeting: 'Hello from Poke' }))
 

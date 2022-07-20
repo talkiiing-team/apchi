@@ -1,4 +1,5 @@
-import { CrudStorage, getBoundStorage } from '@/base/useTable'
+import { getBoundStorage } from '@/base/useTableWithStore'
+import { CrudStorage } from '@/base/types'
 
 const Storage: CrudStorage = {}
 
