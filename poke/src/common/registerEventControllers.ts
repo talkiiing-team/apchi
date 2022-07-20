@@ -10,6 +10,8 @@ import {
 } from '@/types'
 import { Server, Socket } from 'socket.io'
 import { emit } from '@/utils/transport/emit'
+import { exists } from '@/utils/exists'
+import { handlerRestrictUnauthorized } from '@/common/universal/handlerRestrictUnauthorized'
 
 export const registerEventControllers: EventControllerRegistrar =
   (io: Server, socket: Socket, user) => async (controllers: Controller[]) => {
@@ -24,7 +26,11 @@ export const registerEventControllers: EventControllerRegistrar =
         emit(`${fullEventName}.rejected`, socket, hash)(result)
 
     const addListener =
-      (scope: string, controllerTransport?: PokeTransports[]) =>
+      (
+        scope: string,
+        authRequired?: boolean,
+        controllerTransport?: PokeTransports[],
+      ) =>
       (
         eventName: string,
         handler: ListenerFunction,
@@ -36,12 +42,17 @@ export const registerEventControllers: EventControllerRegistrar =
           eventListenerMap.set(
             fullEventRouteName,
             (context: ControllerContext) =>
-              (hash: string, ...params: any[]) =>
-                handler(
-                  createSocketResolve(fullEventRouteName, hash),
+              (hash: string, ...params: any[]) => {
+                if (!authRequired || exists(context.user))
+                  return handler(
+                    createSocketResolve(fullEventRouteName, hash),
+                    createSocketReject(fullEventRouteName, hash),
+                    context,
+                  )(...params)
+                return handlerRestrictUnauthorized(
                   createSocketReject(fullEventRouteName, hash),
-                  context,
-                )(...params),
+                )
+              },
           )
         }
 
@@ -81,9 +92,16 @@ export const registerEventControllers: EventControllerRegistrar =
       }
 
     await controllers.forEach(controller => {
-      controller.register(addListener(controller.scope, controller.transport), {
-        socket,
-      })
+      controller.register(
+        addListener(
+          controller.scope,
+          controller.requireAuth,
+          controller.transport,
+        ),
+        {
+          socket,
+        },
+      )
     })
 
     console.log('Event Listeners', eventListenerMap)

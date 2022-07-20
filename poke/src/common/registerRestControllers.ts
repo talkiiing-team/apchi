@@ -7,6 +7,8 @@ import {
   RestControllerRegistrar,
 } from '@/types'
 import { Router } from 'express'
+import { exists } from '@/utils/exists'
+import { handlerRestrictUnauthorized } from '@/common/universal/handlerRestrictUnauthorized'
 
 export const registerRestControllers: RestControllerRegistrar =
   (router: Router) => async (controllers: Controller[]) => {
@@ -19,7 +21,11 @@ export const registerRestControllers: RestControllerRegistrar =
       res.json({ status: 'rejected', result: result })
 
     const addListener =
-      (scope: string, controllerTransport?: PokeTransports[]) =>
+      (
+        scope: string,
+        authRequired?: boolean,
+        controllerTransport?: PokeTransports[],
+      ) =>
       (
         eventName: string,
         handler: ListenerFunction,
@@ -31,12 +37,15 @@ export const registerRestControllers: RestControllerRegistrar =
           restListenerMap.set(
             fullEventRouteName,
             context =>
-              (res, ...params: any[]) =>
-                handler(
-                  createRestResolve(res),
-                  createRestReject(res),
-                  context,
-                )(...params),
+              (res, ...params: any[]) => {
+                if (!authRequired || exists(context.user))
+                  return handler(
+                    createRestResolve(res),
+                    createRestReject(res),
+                    context,
+                  )(...params)
+                return handlerRestrictUnauthorized(createRestReject(res))
+              },
           )
         }
 
@@ -74,10 +83,17 @@ export const registerRestControllers: RestControllerRegistrar =
 
     await controllers.forEach(controller => {
       let socket = null
-      controller.register(addListener(controller.scope, controller.transport), {
-        // @ts-ignore
-        socket,
-      })
+      controller.register(
+        addListener(
+          controller.scope,
+          controller.requireAuth,
+          controller.transport,
+        ),
+        {
+          // @ts-ignore
+          socket,
+        },
+      )
     })
 
     console.log('Rest API', restListenerMap)

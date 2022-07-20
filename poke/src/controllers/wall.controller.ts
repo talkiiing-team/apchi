@@ -5,7 +5,7 @@ import { WallPost } from '@/models/Wall.model'
 
 export const registerWallController: Controller = createController({
   scope: 'wall',
-  requireAuth: false,
+  requireAuth: true,
   transport: ['rest'],
   register: (addListener, { socket: sock, exposeCrud }) => {
     addListener<WallPost>(

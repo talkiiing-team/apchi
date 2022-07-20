@@ -52,6 +52,7 @@ export type ExposeCrudFunction = []
 export type ControllerContext<T extends Record<string, any> = {}> = {
   user: User | undefined
   event: string
+  authRequired?: boolean
 } & T
 
 export type ControllerRegisterer = (
