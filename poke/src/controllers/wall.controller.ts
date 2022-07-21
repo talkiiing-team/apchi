@@ -7,7 +7,7 @@ export const registerWallController: Controller = createController({
   scope: 'wall',
   requireAuth: true,
   transport: ['rest'],
-  register: (addListener, { socket: sock, exposeCrud }) => {
+  register: addListener => {
     addListener<WallPost>(
       'createPost',
       (resolve, reject, context) => item => {

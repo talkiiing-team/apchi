@@ -82,17 +82,12 @@ export const registerRestControllers: RestControllerRegistrar =
       }
 
     await controllers.forEach(controller => {
-      let socket = null
       controller.register(
         addListener(
           controller.scope,
           controller.requireAuth,
           controller.transport,
         ),
-        {
-          // @ts-ignore
-          socket,
-        },
       )
     })
 

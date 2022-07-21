@@ -2,6 +2,7 @@ import { Server } from 'socket.io'
 import { Socket } from 'socket.io'
 import { Response, Router } from 'express'
 import { User } from '@/models/User.model'
+import { CrudMethodName } from '@/base/types'
 
 export type EventName = string
 
@@ -47,8 +48,6 @@ export type AddListenerFunction = <Props = any>(
   specificTransport?: PokeTransports[],
 ) => void
 
-export type ExposeCrudFunction = []
-
 export type ControllerContext<T extends Record<string, any> = {}> = {
   user: User | undefined
   event: string
@@ -57,13 +56,7 @@ export type ControllerContext<T extends Record<string, any> = {}> = {
 
 export type ControllerRegisterer = (
   addListener: AddListenerFunction,
-  {
-    socket,
-    exposeCrud,
-  }: {
-    socket: Socket
-    exposeCrud?: ExposeCrudFunction
-  },
+  helpers?: any,
 ) => InvalidationFunction | void
 
 export type PokeTransports = 'ws' | 'rest'

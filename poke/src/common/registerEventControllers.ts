@@ -9,7 +9,7 @@ import {
   EventControllerRegistrar,
 } from '@/types'
 import { Server, Socket } from 'socket.io'
-import { emit } from '@/utils/transport/emit'
+import { emit } from '@/transporter/emit'
 import { exists } from '@/utils/exists'
 import { handlerRestrictUnauthorized } from '@/common/universal/handlerRestrictUnauthorized'
 
@@ -98,9 +98,6 @@ export const registerEventControllers: EventControllerRegistrar =
           controller.requireAuth,
           controller.transport,
         ),
-        {
-          socket,
-        },
       )
     })
 

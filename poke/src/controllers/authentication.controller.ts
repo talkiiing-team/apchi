@@ -22,7 +22,7 @@ export const registerAuthenticateController: Controller = createController({
   scope: 'authentication',
   transport: ['rest'],
   requireAuth: false,
-  register: (addListener, { socket, exposeCrud }) => {
+  register: addListener => {
     addListener('auth', (resolve, reject) => (payload: AuthCredentials) => {
       if (payload.strategy === AuthStrategy.Local) {
         if (!exists(payload.login) || !exists(payload.password))

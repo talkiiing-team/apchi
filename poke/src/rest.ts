@@ -1,18 +1,7 @@
 import express, { Router } from 'express'
-import cors from 'cors'
+import app from './baseExpressApp'
 import multer from 'multer'
 import filesStore from '@/store/files.store'
-import { ErrorRequestHandler } from 'express-serve-static-core'
-
-const app = express()
-
-app.use(
-  cors({
-    origin: '*',
-  }),
-)
-
-app.use(express.json())
 
 /**
  * Express has a problem with untyped interface for errors

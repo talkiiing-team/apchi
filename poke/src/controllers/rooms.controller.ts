@@ -13,15 +13,11 @@ import { Crud, DetailedRoom, Room, Section, User } from '@apchi/shared'
 import { createRoomHash } from '@/utils/domain/createRoomHash'
 import { buildLobbyName } from '@/utils/domain/buildLobbyName'
 import { Game } from '@apchi/shared/src/models/Game.model'
-import {
-  GeneralDaemon,
-  sendToRoom,
-  sendToUser,
-  setRoomEngine,
-} from '@/daemon/general.daemon'
+import { GeneralDaemon, setRoomEngine } from '@/daemon/general.daemon'
 import { GameStatus, getGamesIds } from '@apchi/games'
 import socketAuthStore from '@/store/socketAuth.store'
 import { createController } from '@/common/createController'
+import { broadcastRoom, sendToUser } from '@/transporter/broadcastRoom'
 
 export const registerRoomsController: Controller = createController({
   scope: 'rooms',
@@ -274,7 +270,7 @@ export const registerRoomsController: Controller = createController({
         return reject({ reason: 'Select Room first', code: 400 })
 
       setRoomEngine(room.id, room.game, {
-        sendToRoom: sendToRoom(io, room.id),
+        sendToRoom: broadcastRoom(io, room.id),
         sendToUser: sendToUser(io, socketAuthStore),
       })
 

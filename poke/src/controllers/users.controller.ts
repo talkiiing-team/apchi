@@ -8,10 +8,9 @@ export const registerUsersController: Controller = createController({
   scope: 'users',
   requireAuth: true,
   transport: ['ws', 'rest'],
-  register: (addListener, { socket }) => {
+  register: addListener => {
     exposeCrud(userStore, ['get', 'patch', 'update', 'dump', 'dumpToArray'])(
       addListener,
-      { socket },
     )
   },
 })
