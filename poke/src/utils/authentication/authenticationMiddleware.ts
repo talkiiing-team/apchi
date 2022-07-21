@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken'
 import { JWT_KEY } from '@/config/secrets'
-import userStore from '@/store/user.store'
-import { exists } from '@/utils/exists'
 import express from 'express'
 import { authenticatePayload } from '@/utils/authentication/authenticatePayload'
 

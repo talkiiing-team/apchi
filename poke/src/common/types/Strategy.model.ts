@@ -29,6 +29,7 @@ export type AuthCredentials<S extends AuthStrategy = AuthStrategy> =
     ? {
         strategy: S
         refreshToken: string
+        oldAccessToken: string
       }
     : S extends AuthStrategy.VK
     ? {

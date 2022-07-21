@@ -7,6 +7,7 @@ export const authenticatePayload = (
   payload: jwt.JwtPayload,
 ): User | undefined => {
   const { userId } = payload
+  if (!userId) return undefined
   const predictableUser = userStore.get(userId)
   if (exists(predictableUser)) {
     return predictableUser

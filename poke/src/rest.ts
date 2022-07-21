@@ -19,9 +19,9 @@ app.use(express.json())
  */
 
 app.use(((err, req, res, next) => {
+  console.error('ERROR', err.name)
   // @ts-ignore
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    console.error(err)
     return res.status(400).send({
       status: 'rejected',
       reason: 'JSON_PARSE_ERROR',
