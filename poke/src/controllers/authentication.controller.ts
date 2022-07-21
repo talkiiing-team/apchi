@@ -4,12 +4,7 @@ import { Controller } from '@/types'
 import { createController } from '@/common/createController'
 import { exists } from '@/utils/exists'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import {
-  JWT_KEY,
-  JWT_LIFETIME_SEC,
-  REFRESH_TOKEN_LENGTH,
-} from '@/config/secrets'
+import { REFRESH_TOKEN_LENGTH } from '@/config/secrets'
 import {
   AuthCredentials,
   AuthStrategy,
@@ -18,6 +13,7 @@ import {
 } from '@/common/types/Strategy.model'
 import { createRandomUserName } from '@/utils/helpers/createRandomUserName'
 import { nanoid } from 'nanoid'
+import { issueNewToken } from '@/utils/authentication/issueNewToken'
 
 export const registerAuthenticateController: Controller = createController({
   scope: 'authentication',
@@ -36,19 +32,7 @@ export const registerAuthenticateController: Controller = createController({
 
         bcrypt.compare(payload.password, auth.password, (err, result) => {
           if (result) {
-            const newRefreshToken = nanoid(REFRESH_TOKEN_LENGTH)
-            authenticationStore.reduceUpdate(auth.userId, data => ({
-              ...data,
-              refreshToken: newRefreshToken,
-            }))
-            return resolve({
-              userId: auth.userId,
-              login: auth.login,
-              token: jwt.sign({ userId: auth.userId }, JWT_KEY, {
-                expiresIn: JWT_LIFETIME_SEC,
-              }),
-              refreshToken: newRefreshToken,
-            })
+            return resolve(issueNewToken(auth))
           } else {
             return reject({ reason: 'BAD_CREDENTIALS' })
           }
@@ -62,19 +46,7 @@ export const registerAuthenticateController: Controller = createController({
         )
         if (!exists(auth)) return reject({ reason: 'INVALID_REFRESH_TOKEN' })
 
-        const newRefreshToken = nanoid(REFRESH_TOKEN_LENGTH)
-        authenticationStore.reduceUpdate(auth.userId, data => ({
-          ...data,
-          refreshToken: newRefreshToken,
-        }))
-        return resolve({
-          userId: auth.userId,
-          login: auth.login,
-          token: jwt.sign({ userId: auth.userId }, JWT_KEY, {
-            expiresIn: JWT_LIFETIME_SEC,
-          }),
-          refreshToken: newRefreshToken,
-        })
+        return resolve(issueNewToken(auth))
       } else {
         return reject({
           reason: 'UNSUPPORTED_STRATEGY',
@@ -98,31 +70,20 @@ export const registerAuthenticateController: Controller = createController({
               return reject({
                 reason: 'CANT_SOLVE_PASSWORD',
                 err: JSON.stringify(err),
+                message: 'Please, contact maintainer',
               })
             }
-            const authIdentity = authenticationStore.create({
+            const auth = authenticationStore.create({
               login: payload.login,
               password: hash,
               refreshToken: nanoid(REFRESH_TOKEN_LENGTH),
             })
-            const user = userStore.insert(authIdentity.userId, {
+            const user = userStore.insert(auth.userId, {
               name: createRandomUserName(),
-              userId: authIdentity.userId,
+              userId: auth.userId,
             })
 
-            const newRefreshToken = nanoid(REFRESH_TOKEN_LENGTH)
-            authenticationStore.reduceUpdate(authIdentity.userId, data => ({
-              ...data,
-              refreshToken: newRefreshToken,
-            }))
-            return resolve({
-              userId: user!.userId,
-              login: authIdentity.login,
-              token: jwt.sign({ userId: user!.userId }, JWT_KEY, {
-                expiresIn: JWT_LIFETIME_SEC,
-              }),
-              refreshToken: newRefreshToken,
-            })
+            return resolve(issueNewToken(auth))
           })
         } else {
           return reject({

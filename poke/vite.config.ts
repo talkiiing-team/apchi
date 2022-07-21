@@ -11,8 +11,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      fileName: () => 'index.js',
-      formats: ['cjs'],
+      fileName: () => 'index.mjs',
+      formats: ['es'],
     },
     outDir: path.resolve(__dirname, './dist'),
     emptyOutDir: true,

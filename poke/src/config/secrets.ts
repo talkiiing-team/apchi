@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-const DEFAULT_REFRESH_TOKEN_LENGTH = 128
+const DEFAULT_REFRESH_TOKEN_LENGTH = 64
 const DEFAULT_JWT_LIFETIME_SEC = 3600
 
 export const JWT_KEY = (() => {

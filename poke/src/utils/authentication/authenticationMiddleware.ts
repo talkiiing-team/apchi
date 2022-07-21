@@ -3,6 +3,7 @@ import { JWT_KEY } from '@/config/secrets'
 import userStore from '@/store/user.store'
 import { exists } from '@/utils/exists'
 import express from 'express'
+import { authenticatePayload } from '@/utils/authentication/authenticatePayload'
 
 export const authenticationExpressMiddleware: express.RequestHandler = (
   req,
@@ -15,13 +16,8 @@ export const authenticationExpressMiddleware: express.RequestHandler = (
       JWT_KEY,
       (err, payload) => {
         if (err) next()
-        else if (payload) {
-          const predictableUser = userStore.get(
-            (payload as jwt.JwtPayload).userId,
-          )
-          if (exists(predictableUser)) {
-            res.locals.user = predictableUser
-          }
+        else if (payload && typeof payload !== 'string') {
+          res.locals.user = authenticatePayload(payload)
           next()
         }
       },
@@ -38,18 +34,13 @@ export const authenticationSocketMiddleware = (authHeader?: string) =>
         authHeader.split(' ')[1],
         JWT_KEY as jwt.Secret,
         (err, payload) => {
-          if (err) return res(undefined)
-          else if (payload) {
-            const predictableUser = userStore.get(
-              (payload as jwt.JwtPayload).userId,
-            )
-            if (exists(predictableUser)) {
-              return res(predictableUser)
-            }
-            return res(undefined)
+          if (!err && payload && typeof payload !== 'string') {
+            res(authenticatePayload(payload))
           }
+          return res(undefined)
         },
       )
+    } else {
+      return res(undefined)
     }
-    return res(undefined)
   })

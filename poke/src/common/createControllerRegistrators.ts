@@ -3,7 +3,7 @@ import { Server } from 'socket.io'
 import { registerEventControllers } from '@/common/registerEventControllers'
 import { Router } from 'express'
 import { registerRestControllers } from '@/common/registerRestControllers'
-import { authenticationSocketMiddleware } from '@/utils/authenticationMiddleware'
+import { authenticationSocketMiddleware } from '@/utils/authentication/authenticationMiddleware'
 import { User } from '@/models/User.model'
 
 export const createControllerRegistrar = (

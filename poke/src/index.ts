@@ -7,7 +7,7 @@ import {
 } from '@/listeners'
 import { Router } from 'express'
 import { callbackCollection } from '@/utils/beforeExitHook'
-import { authenticationExpressMiddleware } from '@/utils/authenticationMiddleware'
+import { authenticationExpressMiddleware } from '@/utils/authentication/authenticationMiddleware'
 
 const PORT = parseInt(import.meta.env.VITE_PORT || '3071')
 const HOST = import.meta.env.VITE_HOST || '0.0.0.0'
