@@ -181,7 +181,7 @@ export const useTableWithStore =
         STORAGE[tableName] = {}
       },
       length() {
-        return STORAGE[tableName]?.length
+        return Object.keys(STORAGE[tableName]).length
       },
     }
   }

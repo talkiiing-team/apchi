@@ -1,18 +1,17 @@
 import * as path from 'path'
 import viteTsconfigPaths from 'vite-tsconfig-paths'
-import mkCert from 'vite-plugin-mkcert'
 
-import { defineConfig } from 'vite'
+import { defineConfig, Plugin } from 'vite'
 
 import pkg from './package.json'
 
 export default defineConfig({
-  plugins: [viteTsconfigPaths(), mkCert()],
+  plugins: [viteTsconfigPaths() as Plugin],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      fileName: () => 'index.mjs',
-      formats: ['es'],
+      fileName: format => (format === 'es' ? 'index.mjs' : 'index.js'),
+      formats: ['es', 'cjs'],
     },
     outDir: path.resolve(__dirname, './dist'),
     emptyOutDir: true,
@@ -23,5 +22,4 @@ export default defineConfig({
   server: {
     https: true,
   },
-  test: {},
 })
