@@ -5,6 +5,7 @@ import {
   PokeTransports,
   RestListenerMap,
   RestControllerRegistrar,
+  ControllerContext,
 } from '@/types'
 import { Router } from 'express'
 import { exists } from '@/utils/exists'
@@ -97,9 +98,14 @@ export const registerRestControllers: RestControllerRegistrar =
      * START Rest Registration Section
      */
 
+    const context: Pick<ControllerContext, 'transport'> = {
+      transport: 'rest',
+    }
+
     restListenerMap.forEach((listenerFn, eventName) => {
       router.post(`/${eventName}`, (req, res) => {
         return listenerFn({
+          ...context,
           user: res.locals.user,
           event: eventName,
         })(res, req.body)

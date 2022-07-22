@@ -107,7 +107,9 @@ export const registerEventControllers: EventControllerRegistrar =
      * START Socket Registration Section
      */
 
-    const context: Partial<Omit<ControllerContext, 'event'>> = {}
+    const context: Partial<Omit<ControllerContext, 'event'>> = {
+      transport: 'ws',
+    }
 
     eventListenerMap.forEach((listenerFn, eventName) => {
       socket.on(

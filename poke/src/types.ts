@@ -52,6 +52,7 @@ export type ControllerContext<T extends Record<string, any> = {}> = {
   user: User | undefined
   event: string
   authRequired?: boolean
+  transport: PokeTransports
 } & T
 
 export type ControllerRegisterer = (
@@ -63,7 +64,7 @@ export type PokeTransports = 'ws' | 'rest'
 
 export type Controller = {
   scope: string
-  transport: PokeTransports[]
+  transport?: PokeTransports[]
   requireAuth?: boolean
   register: ControllerRegisterer
 }

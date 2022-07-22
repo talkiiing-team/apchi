@@ -4,7 +4,7 @@ import { Controller } from '@/types'
 import { createController } from '@/common/createController'
 import { exists } from '@/utils/exists'
 import bcrypt from 'bcrypt'
-import { JWT_KEY, REFRESH_TOKEN_LENGTH } from '@/config/secrets'
+import { REFRESH_TOKEN_LENGTH } from '@/config/secrets'
 import {
   AuthCredentials,
   AuthStrategy,
@@ -14,9 +14,8 @@ import {
 import { createRandomUserName } from '@/utils/helpers/createRandomUserName'
 import { nanoid } from 'nanoid'
 import { issueNewToken } from '@/utils/authentication/issueNewToken'
-import jwt from 'jsonwebtoken'
 import { authenticatePayload } from '@/utils/authentication/authenticatePayload'
-import { User } from '@/models/User.model'
+import { extractJwtInfo } from '@/utils/authentication/extractJwtInfo'
 
 export const registerAuthenticateController: Controller = createController({
   scope: 'authentication',
@@ -46,17 +45,7 @@ export const registerAuthenticateController: Controller = createController({
         if (!exists(payload.oldAccessToken))
           return reject({ reason: 'EMPTY_OLD_ACCESS_TOKEN' })
 
-        const jwtBody = jwt.verify(
-          payload.oldAccessToken,
-          JWT_KEY as jwt.Secret,
-          {
-            complete: false,
-            // We need only payload
-            ignoreExpiration: true,
-            // Ignoring expiration, for user detection purposes
-            // It gives a bit more secure finding
-          },
-        )
+        const jwtBody = extractJwtInfo(payload.oldAccessToken)
 
         const user =
           jwtBody && typeof jwtBody !== 'string'

@@ -3,7 +3,7 @@ import { Server } from 'socket.io'
 
 export const createController = (controller: {
   scope: Controller['scope']
-  transport: Controller['transport']
+  transport?: Controller['transport']
   requireAuth?: Controller['requireAuth']
   register: ControllerRegisterer
 }): Controller => {

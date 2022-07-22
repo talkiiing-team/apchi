@@ -17,7 +17,7 @@ import { GeneralDaemon, setRoomEngine } from '@/daemon/general.daemon'
 import { GameStatus, getGamesIds } from '@apchi/games'
 import socketAuthStore from '@/store/socketAuth.store'
 import { createController } from '@/common/createController'
-import { broadcastRoom, sendToUser } from '@/transporter/broadcastRoom'
+import { broadcastRoom } from '@/transporter/broadcastRoom'
 
 export const registerRoomsController: Controller = createController({
   scope: 'rooms',

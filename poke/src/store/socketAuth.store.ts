@@ -1,9 +1,9 @@
 import { useTable } from '@/store/store'
-import { SocketAuth, primaryKey } from '@/models/SocketAuth.model'
+import { SocketMap, primaryKey } from '@/models/SocketMap.model'
 
-export const socketAuthStore = useTable<SocketAuth, typeof primaryKey>(
+export const socketMapStore = useTable<SocketMap, typeof primaryKey>(
   'socketAuth',
   primaryKey,
 )
 
-export default socketAuthStore
+export default socketMapStore

@@ -10,13 +10,17 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      fileName: format => (format === 'es' ? 'index.mjs' : 'index.js'),
-      formats: ['es', 'cjs'],
+      fileName: () => 'index.js',
+      formats: ['es'],
     },
     outDir: path.resolve(__dirname, './dist'),
     emptyOutDir: true,
     rollupOptions: {
-      external: [...Object.keys(pkg.dependencies), 'http', 'nanoid'],
+      external: [
+        ...Object.keys(pkg.dependencies),
+        ...Object.keys(pkg.devDependencies),
+        'http',
+      ],
     },
   },
   server: {
